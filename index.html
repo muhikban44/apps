@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f5f0">
+  <title>Learning &amp; Programming — L&amp;P</title>
+  <meta name="description" content="Belajar pemrograman web lewat materi berbahasa Indonesia, kuis, dan praktik langsung di editor kode.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink: #202522;
+  --muted: #858a82;
+  --paper: #f6f5f0;
+  --card: #fffefa;
+  --line: #ebeae3;
+  --green: #c9f26b;
+  --green-deep: #496822;
+  --purple: #eee7ff;
+  --sidebar: #222823;
+  --font-body: "DM Sans", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scroll-padding-top: 30px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 14px; -webkit-font-smoothing: antialiased; }
+button, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible, textarea:focus-visible { outline: 3px solid #a8cf50; outline-offset: 3px; }
+.app-shell { min-height: 100vh; }
+
+.sidebar { width: 248px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 10; display: flex; flex-direction: column; padding: 29px 20px 17px; background: var(--sidebar); color: #fff; }
+.brand { display: inline-flex; align-items: center; gap: 12px; width: fit-content; margin: 0 0 42px 4px; font: 700 19px var(--font-display); letter-spacing: -.8px; }
+.brand-mark { width: 42px; height: 42px; position: relative; isolation: isolate; display: grid; place-items: center; flex: 0 0 42px; overflow: visible; border-radius: 13px; background: linear-gradient(135deg,#e6ff9b 0%,#a7d84f 42%,#6c9c35 100%); color: #1e2a16; font: 800 14px var(--font-display); letter-spacing: -1.2px; box-shadow: 0 0 0 1px #e5ffad88, 0 5px 16px #a6d85b44, inset 0 1px 0 #ffffffb0; animation: lp-logo-float 3.2s ease-in-out infinite; }
+.brand-mark::before { content: ""; position: absolute; z-index: -1; inset: -4px; border: 1px solid #c9f26b99; border-radius: 16px; animation: lp-logo-ring 4s linear infinite; }
+.brand-mark::after { content: "✦"; position: absolute; top: -8px; right: -7px; color: #e5ff9c; font-size: 12px; text-shadow: 0 0 9px #d9ff83; animation: lp-logo-spark 2s ease-in-out infinite; }
+.brand-mark span { display: inline-block; background: linear-gradient(110deg,#1d2b16 20%,#536b34 42%,#1d2b16 62%); background-size: 220% 100%; color: transparent; background-clip: text; -webkit-background-clip: text; animation: lp-logo-shine 3.5s ease-in-out infinite; }
+@keyframes lp-logo-float { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-3px) rotate(-2deg); } }
+@keyframes lp-logo-ring { 0% { transform: rotate(0) scale(.96); opacity:.25; } 50% { transform: rotate(180deg) scale(1.06); opacity:.8; } 100% { transform: rotate(360deg) scale(.96); opacity:.25; } }
+@keyframes lp-logo-spark { 0%,100% { transform: scale(.7) rotate(0); opacity:.45; } 50% { transform: scale(1.25) rotate(35deg); opacity:1; } }
+@keyframes lp-logo-shine { 0%,100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+@media(prefers-reduced-motion:reduce){.brand-mark,.brand-mark::before,.brand-mark::after,.brand-mark span{animation:none!important}}
+.brand-light { color: #c8ec7c; }
+.sidebar-label { padding: 0 10px; margin-bottom: 12px; color: #8e958c; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; }
+.main-nav, .course-nav { display: grid; gap: 5px; }
+.nav-link, .course-link { display: flex; align-items: center; min-height: 39px; gap: 11px; padding: 0 10px; border-radius: 7px; color: #b7beb5; font-size: 12px; transition: background .18s, color .18s; }
+.nav-link:hover, .course-link:hover { background: #2f3730; color: #fff; }
+.nav-link.active { background: #333b32; color: #c9ed7a; font-weight: 600; }
+.nav-icon { width: 18px; color: #a4ada0; font-size: 16px; text-align: center; }
+.active .nav-icon { color: #c9ed7a; }
+.course-label { margin: 34px 0 11px; }
+.course-link { min-height: 37px; font-size: 11.5px; }
+.course-marker { width: 8px; height: 8px; border-radius: 3px; background: #dc9f64; }
+.course-link:nth-child(2) .course-marker { background: #8cadf2; }
+.course-link:nth-child(3) .course-marker { background: #a88aea; }
+.course-link:nth-child(4) .course-marker { background: #75c79d; }
+.course-link:nth-child(5) .course-marker { background: #e4b667; }
+.course-link.locked { color: #91978f; }
+.lock-icon { margin-left: auto; color: #8f958d; font-size: 12px; }
+.sidebar-premium { position: relative; display: flex; flex-direction: column; gap: 7px; margin-top: auto; padding: 15px 13px 13px; overflow: hidden; border: 1px solid #485040; border-radius: 10px; background: linear-gradient(135deg, #30372c, #2a3029); }
+.premium-spark { position: absolute; top: 11px; right: 12px; color: #d3f593; font-size: 16px; }
+.premium-title { max-width: 145px; font-size: 12px; font-weight: 700; }
+.premium-copy { max-width: 168px; color: #aeb5aa; font-size: 10px; line-height: 1.5; }
+.premium-link { margin-top: 2px; color: #d6ef9d; font-size: 10px; font-weight: 700; }
+.sidebar-footer { display: flex; align-items: center; gap: 7px; padding: 15px 3px 0; color: #969d94; font-size: 9px; }
+.online-dot, .free-dot, .live-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #9ed45b; }
+
+.main-content { max-width: 1350px; min-height: 100vh; margin-left: 248px; padding: 0 53px 22px; }
+.topbar { display: flex; height: 66px; align-items: center; justify-content: space-between; border-bottom: 1px solid #eae9e2; }
+.breadcrumb { color: #9a9d94; font-size: 11px; }
+.breadcrumb span { padding: 0 8px; color: #cbc9c0; }
+.breadcrumb strong { color: #414740; font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-caption { color: #93988e; font-size: 9px; font-weight: 700; letter-spacing: .9px; }
+.streak-badge { display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 37px; height: 24px; padding: 0 7px; border: 1px solid #ece8d6; border-radius: 13px; background: #fffdf3; color: #d39b3b; font-size: 11px; font-weight: 700; }
+.avatar { display: grid; width: 29px; height: 29px; place-items: center; border: 1px solid #e1ebd1; border-radius: 50%; background: #e7efd8; color: #597442; font-size: 11px; font-weight: 700; }
+.account-button { display: inline-flex; align-items: center; gap: 7px; padding: 3px 7px 3px 3px; border: 1px solid #e8e9df; border-radius: 19px; background: #fffefa; color: #5a6651; cursor: pointer; }
+.account-button:hover { border-color: #cbd8b4; background: #fbfcf6; }
+.account-label { max-width: 100px; overflow: hidden; font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.menu-toggle { display: none !important; }
+
+.welcome-section { position: relative; min-height: 224px; display: flex; align-items: center; justify-content: space-between; margin-top: 25px; padding: 28px 43px; overflow: hidden; border: 1px solid #e9e8df; border-radius: 13px; background: #fffefa; }
+.welcome-copy { position: relative; z-index: 1; width: 62%; }
+.eyebrow { display: inline-flex; align-items: center; gap: 7px; color: #798367; font-size: 9px; font-weight: 700; letter-spacing: 1.15px; }
+.eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: #a4c65a; }
+h1, h2, p { margin-top: 0; }
+.welcome-copy h1 { margin: 13px 0 8px; font: 600 clamp(24px, 2.55vw, 34px)/1.22 var(--font-display); letter-spacing: -1.25px; }
+.wave { display: inline-block; font-family: var(--font-body); font-size: .72em; transform: rotate(-18deg); }
+.highlight-text { color: #83a842; }
+.welcome-copy p { max-width: 460px; margin-bottom: 17px; color: #858980; font-size: 11px; line-height: 1.7; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 34px; padding: 0 14px; border: 0; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: 700; transition: transform .18s, background .18s; }
+.button:hover { transform: translateY(-1px); }
+.button-primary { background: #273028; color: #f5f8f0; }
+.button-primary:hover { background: #3a4938; }
+.hero-art { position: relative; width: 35%; height: 175px; display: grid; place-items: center; }
+.hero-orbit { position: absolute; width: 170px; height: 170px; border: 1px dashed #e7e8db; border-radius: 50%; }
+.orbit-two { width: 126px; height: 126px; border-color: #e0e7d2; }
+.hero-code-card { position: relative; z-index: 1; width: 210px; padding: 12px 15px 13px; border: 1px solid #3b433a; border-radius: 8px; background: #252b26; box-shadow: 0 12px 28px #2b34231c; transform: rotate(-4deg); }
+.code-dots { display: flex; align-items: center; gap: 4px; padding-bottom: 10px; border-bottom: 1px solid #394139; }
+.code-dots i { width: 5px; height: 5px; border-radius: 50%; background: #d88378; }
+.code-dots i:nth-child(2) { background: #dbb655; }.code-dots i:nth-child(3) { background: #8bbe72; }
+.code-dots span { margin-left: 8px; color: #a9b2a4; font-size: 8px; }
+.code-lines { display: grid; gap: 6px; padding-top: 10px; color: #e5e9dc; font: 9px/1.2 Consolas, monospace; }
+.line-no { color: #707a6d; }.code-purple { color: #d2a9e8; }.code-yellow { color: #e7cb70; }.code-green { color: #add389; }
+.floating-chip { position: absolute; z-index: 2; padding: 6px 9px; border: 1px solid #ecebe4; border-radius: 5px; background: #fffefa; box-shadow: 0 3px 12px #2730280c; font-size: 8px; font-weight: 700; }
+.chip-html { top: 17px; left: 4%; color: #bd7853; }.chip-css { right: 2%; top: 41px; color: #6b85bc; }.chip-js { right: 8%; bottom: 13px; color: #bc9c40; }
+.hero-sparkle { position: absolute; color: #afcc72; }.sparkle-one { top: 10px; right: 22%; font-size: 14px; }.sparkle-two { left: 3%; bottom: 20px; font-size: 11px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; margin-top: 15px; }
+.stat-card { position: relative; display: flex; min-height: 71px; align-items: center; gap: 11px; padding: 12px 13px; border: 1px solid #ebeae3; border-radius: 9px; background: #fffefa; }
+.stat-icon { display: grid; width: 33px; height: 33px; flex: 0 0 auto; place-items: center; border-radius: 8px; font-size: 15px; }
+.icon-purple { background: #f0eafe; color: #997cd5; }.icon-yellow { background: #fff4d7; color: #c89a35; }.icon-green { background: #ebf3dc; color: #78a048; }
+.stat-info { display: grid; gap: 4px; }
+.stat-info > span { color: #92958c; font-size: 9px; }
+.stat-info strong { color: #30362f; font: 600 12px var(--font-display); }
+.stat-info small { color: #999c92; font: 400 9px var(--font-body); }
+.stat-side-label { margin-left: auto; color: #a2a397; font-size: 8px; font-weight: 700; letter-spacing: .6px; }
+.level-pill { margin-left: auto; padding: 5px 7px; border-radius: 4px; background: #f2f6e8; color: #6f8b40; font-size: 8px; font-weight: 700; letter-spacing: .4px; }
+.stat-action { margin-left: auto; color: #99ab7c; font-size: 18px; }
+
+.section-heading, .workspace-heading { display: flex; align-items: end; justify-content: space-between; }
+.section-heading { margin: 36px 0 13px; }
+.page-heading { margin: 34px 0 16px; }
+.page-heading h2 { margin: 5px 0 0; font: 600 24px var(--font-display); letter-spacing: -.7px; }
+.page-heading p { margin: 7px 0 0; color: #858980; font-size: 11px; line-height: 1.6; }
+.section-eyebrow { color: #929783; font-size: 8px; }
+.section-heading h2, .workspace-heading h2 { margin: 5px 0 0; font: 600 19px var(--font-display); letter-spacing: -.5px; }
+.section-heading.page-heading h2, .workspace-heading.page-heading h2 { font-size: 24px; }
+.section-note { display: inline-flex; align-items: center; gap: 6px; padding-bottom: 3px; color: #868a80; font-size: 9px; }
+.free-dot { width: 6px; height: 6px; }
+.curriculum-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.course-card { position: relative; min-height: 180px; padding: 15px 15px 14px; overflow: hidden; border: 1px solid #e9e8e1; border-radius: 9px; background: #fffefa; transition: transform .18s, box-shadow .18s; }
+.course-card:hover:not(.course-locked) { transform: translateY(-2px); box-shadow: 0 8px 22px #2b342309; }
+.course-card.course-locked { background: #fcfbf7; }
+.course-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.course-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 8px; font: 700 14px var(--font-display); }
+.tone-html .course-icon { background: #fff0e6; color: #d18156; }.tone-css .course-icon { background: #eaf0ff; color: #7290d4; }.tone-js .course-icon { background: #fff5cf; color: #b39437; }.tone-dom .course-icon { background: #f0eafe; color: #9876cb; }.tone-data .course-icon { background: #e5f3e9; color: #68a17b; }.tone-project .course-icon { background: #fdebe9; color: #c77c74; }.tone-advanced .course-icon { background: #f2ebdc; color: #ac8751; }
+.course-level { padding: 5px 6px; border-radius: 4px; background: #f5f4ef; color: #85877d; font-size: 7px; font-weight: 700; letter-spacing: .55px; }
+.course-card h3 { margin: 12px 0 5px; font: 600 13px var(--font-display); letter-spacing: -.15px; }
+.course-card p { min-height: 28px; margin-bottom: 11px; color: #858980; font-size: 9px; line-height: 1.55; }
+.course-meta { display: flex; align-items: center; justify-content: space-between; color: #90938a; font-size: 8px; }
+.course-meta strong { color: #6f746b; font-weight: 600; }
+.course-progress { height: 3px; margin-top: 10px; overflow: hidden; border-radius: 3px; background: #eeede7; }
+.course-progress-fill { height: 100%; border-radius: inherit; background: #b1d567; transition: width .3s; }
+.course-open { position: absolute; inset: 0; display: block; border: 0; background: transparent; cursor: pointer; }
+.course-card:focus-within { outline: 2px solid #a8cf50; outline-offset: 3px; }
+.locked-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; background: #faf9f3bb; color: #727366; font-size: 9px; font-weight: 700; }
+.locked-overlay span { font-size: 13px; }
+.locked-overlay { pointer-events: none; }
+
+.quiz-page { padding-bottom: 5px; }
+.quiz-page-heading { margin-bottom: 16px; }
+.quiz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.quiz-page-card { min-width: 0; padding: 17px; border: 1px solid #e9e8e1; border-radius: 10px; background: #fffefa; }
+.quiz-page-card h3 { margin: 13px 0 8px; font: 600 14px var(--font-display); letter-spacing: -.2px; }
+.quiz-card-top { display: flex; align-items: center; justify-content: space-between; }
+.quiz-course-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 8px; background: #f0eafe; color: #7290d4; font: 700 12px var(--font-display); }
+.tone-html .quiz-course-icon { background: #fff0e6; color: #d18156; }.tone-css .quiz-course-icon { background: #eaf0ff; color: #7290d4; }.tone-js .quiz-course-icon { background: #fff5cf; color: #b39437; }.tone-dom .quiz-course-icon { background: #f0eafe; color: #9876cb; }.tone-data .quiz-course-icon { background: #e5f3e9; color: #68a17b; }.tone-project .quiz-course-icon { background: #fdebe9; color: #c77c74; }.tone-advanced .quiz-course-icon { background: #f2ebdc; color: #ac8751; }
+.quiz-page-card .quiz-question { min-height: 34px; margin-bottom: 13px; font-size: 10px; }
+.quiz-page-card .quiz-options { gap: 7px; }
+.quiz-page-card .quiz-option { min-height: 37px; padding: 9px 10px; font-size: 9px; }
+.quiz-page-card .quiz-feedback { min-height: 18px; }
+.quiz-page-card .quiz-actions { margin-top: 7px; }
+.quiz-start:disabled { cursor: not-allowed; opacity: .55; }
+.quiz-access { margin-top: 2px; }
+.quiz-page-card-locked { background: #fcfbf7; }
+.quiz-load-error { grid-column: 1 / -1; color: #a45e50; font-size: 10px; }
+
+.workspace-section { margin-top: 38px; }
+.workspace-heading { margin-bottom: 13px; }
+.workspace-heading h2 { font-size: 19px; }
+.workspace-heading p { margin: 6px 0 0; color: #878a82; font-size: 10px; }
+.workspace-heading p strong { color: #53594f; }
+.heading-spark { color: #9abd57; font-size: 15px; }
+.workspace-badge { display: flex; align-items: center; gap: 6px; padding-bottom: 2px; color: #83897a; font-size: 8px; font-weight: 700; letter-spacing: .65px; }
+.live-dot { width: 6px; height: 6px; }
+.editor-card { overflow: hidden; border: 1px solid #e5e5dc; border-radius: 9px; background: #fffefa; }
+.editor-toolbar { display: flex; min-height: 43px; align-items: center; justify-content: space-between; padding: 0 11px 0 14px; border-bottom: 1px solid #ebeae4; }
+.file-tab { display: flex; height: 43px; align-items: center; gap: 7px; margin-bottom: -1px; padding: 0 10px; border-bottom: 2px solid #9ac151; color: #4f554c; font-size: 9px; font-weight: 600; }
+.file-icon { color: #8cae52; font-size: 12px; }.tab-close { margin-left: 6px; color: #9da094; font-size: 12px; }
+.language-picker-label { color: #868a80; font-size: 8px; font-weight: 700; }
+#language-select { max-width: 145px; min-width: 90px; min-height: 27px; padding: 0 19px 0 7px; border: 1px solid #e5e5dc; border-radius: 5px; background: #fffefa; color: #4f554c; font: 600 9px var(--font-body); }
+.editor-actions { display: flex; align-items: center; gap: 6px; }
+.button-subtle { min-height: 26px; padding: 0 7px; background: transparent; color: #777c72; font-size: 9px; }
+.button-subtle:hover { background: #f3f3ec; }
+.button-run { min-height: 27px; padding: 0 10px; background: #88ad49; color: #fff; font-size: 9px; }
+.button-run:hover { background: #72973a; }
+.button-run span { font-size: 8px; }
+.editor-panes { display: grid; min-height: 270px; grid-template-columns: 1fr 1fr; }
+.code-pane { display: flex; min-width: 0; flex-direction: column; border-right: 1px solid #ebeae4; background: #fcfcf8; }
+.preview-pane { display: flex; min-width: 0; min-height: 0; flex-direction: column; align-items: center; justify-content: flex-start; overflow: hidden; background: #eef1ed; }
+.pane-heading { display: flex; min-height: 32px; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #f0efe9; color: #868a80; font-size: 8px; font-weight: 700; letter-spacing: .7px; }
+.html-label { padding: 3px 5px; border-radius: 3px; background: #fff2e9; color: #ba7d57; font-size: 7px; letter-spacing: .1px; }
+.code-input-wrap { display: flex; flex: 1; min-height: 198px; padding: 12px 5px 10px 0; overflow: auto; }
+.line-numbers { display: flex; min-width: 38px; flex-direction: column; align-items: flex-end; padding-right: 10px; color: #b1b4aa; font: 10px/17px Consolas, monospace; user-select: none; }
+#code-editor { width: 100%; min-width: 0; min-height: 190px; resize: vertical; border: 0; outline: 0; background: transparent; color: #434b42; font: 10px/17px Consolas, "Courier New", monospace; tab-size: 2; white-space: pre; }
+#code-editor:focus-visible { outline: none; }
+.runtime-setup-note { margin: 0; padding: 8px 11px; border-top: 1px solid #f0efe9; color: #858980; font-size: 9px; line-height: 1.5; }
+.editor-status { display: flex; min-height: 27px; align-items: center; justify-content: space-between; padding: 0 11px; border-top: 1px solid #f0efe9; color: #95998f; font-size: 8px; }
+.editor-status > span:first-child { display: flex; align-items: center; gap: 5px; }
+.status-dot { width: 5px; height: 5px; border-radius: 50%; background: #9ac45c; }
+#preview-frame { display:block; width:100%; height:72vh; min-height:520px; max-width:100%; flex:1 1 auto; border:0; border-radius:14px; background:#fff; box-shadow:0 8px 28px #17221b26; transform:none; }
+.preview-pane .pane-heading{width:100%;flex:0 0 auto}
+.preview-fullscreen-btn{border:1px solid #52606c;background:#303a44;color:#eef3f7;border-radius:6px;padding:5px 9px;font-size:10px;cursor:pointer}
+.preview-pane.is-fullscreen{position:fixed!important;inset:0!important;z-index:99999!important;width:100vw!important;height:100dvh!important;min-height:0!important;padding:0!important;margin:0!important;border-radius:0!important;background:#111820!important}
+.preview-pane.is-fullscreen #preview-frame{width:100%!important;height:auto!important;min-height:0!important;flex:1 1 auto!important;border-radius:0!important;box-shadow:none!important}
+.preview-pane.is-fullscreen .preview-tip{display:none}
+#preview-frame pre { padding: 8px; border-radius: 6px; background: #f3f5ef; color: #536844; font: 12px/1.5 Consolas, "Courier New", monospace; }
+.preview-screen { display: inline-flex; align-items: center; gap: 4px; font-size: 7px; font-weight: 500; letter-spacing: 0; }
+.preview-screen i { width: 7px; height: 7px; border: 1px solid #9da392; border-radius: 2px; }
+.preview-tip { display:flex; width:100%; min-height:27px; flex:0 0 auto; align-items:center; justify-content:center; gap:5px; padding:0 8px; border-top:1px solid #e0e5df; background:#f7f8f5; color:#778078; font-size:8px; text-align:center; }
+
+.premium-section { position: relative; display: flex; min-height: 111px; align-items: center; gap: 20px; margin-top: 21px; padding: 16px 20px 16px 125px; overflow: hidden; border: 1px solid #394139; border-radius: 9px; background: #272e28; color: #fff; }
+.premium-banner-art { position: absolute; top: 0; bottom: 0; left: 0; width: 112px; overflow: hidden; background: #313b2d; }
+.pro-spark { position: absolute; top: 26px; left: 41px; z-index: 1; color: #d4f39a; font-size: 27px; }
+.pro-orbit { position: absolute; top: 14px; left: 18px; width: 79px; height: 79px; border: 1px solid #718052; border-radius: 50%; }
+.pro-cube { position: absolute; right: 9px; bottom: 9px; color: #86a752; font-size: 14px; }
+.premium-banner-copy { flex: 1; }
+.pro-eyebrow { color: #b5cf87; font-size: 8px; }
+.premium-banner-copy h2 { margin: 6px 0 5px; font: 600 16px var(--font-display); letter-spacing: -.3px; }
+.premium-banner-copy p { max-width: 455px; margin: 0; color: #b1b8ad; font-size: 9px; line-height: 1.6; }
+.button-premium { flex: 0 0 auto; min-height: 31px; background: var(--green); color: #283222; font-size: 9px; }
+.button-premium:hover { background: #d8ff8b; }
+.page-footer { display: flex; justify-content: space-between; padding: 18px 1px 0; color: #95998f; font-size: 8px; }
+.footer-brand { color: #5a6552; font: 600 9px var(--font-display); }
+.page-footer > span > span { color: #b1c871; }
+
+.modal-backdrop { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: #1d241fb3; backdrop-filter: blur(4px); }
+.modal-backdrop[hidden] { display: none; }
+.dialog { position: relative; width: min(100%, 520px); max-height: min(88vh, 700px); padding: 26px; overflow-y: auto; border: 1px solid #eae9e1; border-radius: 13px; background: #fffefa; box-shadow: 0 18px 70px #13191330; }
+.dialog-close { position: absolute; top: 12px; right: 13px; display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 50%; background: #f3f2ec; color: #74796e; cursor: pointer; font-size: 19px; }
+.dialog-kicker { color: #7d9061; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+.dialog h2 { margin: 7px 34px 6px 0; font: 600 23px var(--font-display); letter-spacing: -.7px; }
+.dialog-intro { margin: 0 0 17px; color: #81867b; font-size: 11px; line-height: 1.7; }
+.lesson-list { display: grid; gap: 7px; }
+.lesson-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #ecebe5; border-radius: 7px; background: #fff; }
+.lesson-number { display: grid; width: 24px; height: 24px; flex: 0 0 auto; place-items: center; border-radius: 6px; background: #f1f2e9; color: #7f9460; font-size: 9px; font-weight: 700; }
+.lesson-item.is-done .lesson-number { background: #eaf4dc; color: #6b923b; }
+.lesson-main { flex: 1; min-width: 0; }
+.lesson-title { display: block; color: #3f453d; font-size: 10px; font-weight: 600; }
+.lesson-description { display: block; margin-top: 3px; color: #91948b; font-size: 8px; line-height: 1.5; }
+.lesson-duration { color: #9a9c91; font-size: 8px; white-space: nowrap; }
+.lesson-open, .quiz-start { min-height: 26px; padding: 0 9px; border: 0; border-radius: 5px; background: #eff3e7; color: #64823e; cursor: pointer; font-size: 8px; font-weight: 700; white-space: nowrap; }
+.lesson-open:hover, .quiz-start:hover { background: #e1edcd; }
+.lesson-example-heading { display: flex; justify-content: space-between; padding: 8px 10px; border: 1px solid #ecebe5; border-bottom: 0; border-radius: 7px 7px 0 0; color: #82877b; font-size: 8px; font-weight: 700; letter-spacing: .7px; }
+.lesson-code { margin: 0 0 13px; padding: 12px; overflow: auto; border: 1px solid #ecebe5; border-radius: 0 0 7px 7px; background: #f7f7f2; color: #465044; font: 10px/1.65 Consolas, "Courier New", monospace; white-space: pre; }
+.lesson-challenge { display: grid; gap: 5px; padding: 11px; border: 1px solid #e8ebdf; border-radius: 7px; background: #f7f8f1; color: #69705f; font-size: 9px; line-height: 1.55; }
+.lesson-challenge strong { color: #768d4f; font-size: 9px; }
+.lesson-view-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; margin-top: 13px; }
+.lesson-view-actions .button { min-height: 29px; font-size: 8px; }
+.lesson-try { color: #6e8650; }
+.lesson-view-actions #back-to-course { margin-right: auto; }
+.quiz-card { margin-top: 15px; padding: 13px; border-radius: 8px; background: #f6f6ef; }
+.quiz-card h3 { margin: 0 0 9px; font: 600 12px var(--font-display); }
+.quiz-question { margin: 0 0 9px; color: #555b50; font-size: 10px; line-height: 1.5; }
+.quiz-options { display: grid; gap: 6px; }
+.quiz-option { display: flex; align-items: center; gap: 8px; padding: 8px 9px; border: 1px solid #e8e8df; border-radius: 5px; background: #fffefa; color: #50564c; cursor: pointer; font-size: 9px; text-align: left; }
+.quiz-option:hover { border-color: #bed591; }.quiz-option.selected { border-color: #9dbc69; background: #f3f8e9; }
+.quiz-option.correct { border-color: #95c46c; background: #edf6e4; }.quiz-option.incorrect { border-color: #df9c8f; background: #fff0ed; }
+.quiz-feedback { min-height: 15px; margin: 8px 0 0; color: #687b4d; font-size: 9px; line-height: 1.5; }
+.quiz-actions { display: flex; align-items: center; gap: 10px; margin-top: 9px; }
+.quiz-status { color: #878b81; font-size: 8px; }
+.dialog-action { margin-top: 14px; }
+.premium-dialog-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 10px; background: #f0f4e7; color: #82a84a; font-size: 21px; }
+.premium-dialog-features { display: grid; gap: 9px; margin: 14px 0 18px; color: #58604f; font-size: 10px; }
+.premium-dialog-features span { display: flex; align-items: center; gap: 8px; }
+.premium-dialog-features b { color: #85a74e; font-size: 12px; }
+.payment-note { padding: 11px; border: 1px solid #ece9dc; border-radius: 7px; background: #faf8f0; color: #77796d; font-size: 9px; line-height: 1.6; }
+.demo-payment-note { margin: 12px 0 0; }
+.demo-payment-note strong { color: #825f2e; }
+.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.plan-card { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 12px 12px; border: 1px solid #e7e8de; border-radius: 8px; background: #fff; }
+.plan-featured { border-color: #b5cc8f; background: #fbfdf6; }
+.plan-period { color: #858a7e; font-size: 8px; font-weight: 700; letter-spacing: .8px; }
+.plan-price { color: #303a2d; font: 700 19px var(--font-display); letter-spacing: -.5px; white-space: nowrap; }
+.plan-price span { margin-left: 3px; color: #858a7e; font: 500 8px var(--font-body); letter-spacing: 0; }
+.plan-description { min-height: 13px; color: #868b81; font-size: 8px; }
+.plan-popular { position: absolute; top: 9px; right: 8px; padding: 4px 5px; border-radius: 4px; background: #eaf2dd; color: #67823e; font-size: 7px; font-weight: 700; letter-spacing: .3px; }
+.button-plan { width: 100%; min-height: 30px; margin-top: 2px; padding: 0 8px; background: #f0f3e9; color: #5f7840; font-size: 8px; }
+.plan-featured .button-plan { background: #29332a; color: #f5f8f0; }
+.button-plan:hover { background: #e6edda; }
+.plan-featured .button-plan:hover { background: #3a4938; }
+.checkout-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 14px 0; padding: 12px; border: 1px solid #e9e9e1; border-radius: 7px; background: #fbfbf7; color: #394136; font-size: 11px; }
+.checkout-summary > span { display: grid; gap: 4px; }
+.checkout-summary small { color: #898e84; font-size: 8px; }
+.checkout-summary > strong { font: 700 15px var(--font-display); white-space: nowrap; }
+.payment-methods { display: grid; gap: 7px; margin: 0; padding: 0; border: 0; }
+.payment-methods legend { margin-bottom: 8px; color: #586052; font-size: 9px; font-weight: 700; }
+.payment-method { display: flex; align-items: center; gap: 9px; padding: 9px; border: 1px solid #e8e9e1; border-radius: 6px; background: #fff; cursor: pointer; }
+.payment-method:has(input:checked) { border-color: #a8c47a; background: #fbfdf7; }
+.payment-method input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.payment-method input:focus-visible + .payment-method-icon { outline: 3px solid #a8cf50; outline-offset: 2px; }
+.payment-method-icon { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 6px; background: #f0f3e9; color: #718b4b; font-size: 14px; }
+.payment-method > span:nth-of-type(2) { display: grid; flex: 1; gap: 3px; color: #4b5147; font-size: 9px; }
+.payment-method small { color: #90948b; font-size: 8px; }
+.payment-radio { width: 13px; height: 13px; border: 1px solid #bdc2b5; border-radius: 50%; }
+.payment-method input:checked ~ .payment-radio { border: 4px solid #83a850; }
+.checkout-notice { margin-top: 12px; padding: 10px 11px; border: 1px solid #eee5d1; border-radius: 6px; background: #fdf9ef; color: #797263; font-size: 8px; line-height: 1.6; }
+.checkout-notice strong { color: #775e35; }
+.demo-result-icon { display: grid; width: 42px; height: 42px; margin-bottom: 12px; place-items: center; border-radius: 50%; background: #eef5e5; color: #6d9742; font-size: 20px; }
+.demo-result-notice { margin-bottom: 14px; border-color: #f0ded5; background: #fff7f3; }
+.demo-result-notice strong { color: #995d49; }
+.checkout-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 13px; }
+.checkout-actions .button { min-height: 34px; font-size: 9px; }
+.checkout-actions #simulate-payment { flex: 1; }
+.empty-message { color: #888c82; font-size: 10px; }
+.auth-form { display: grid; gap: 8px; }
+.auth-form label { margin-top: 2px; color: #51594d; font-size: 9px; font-weight: 700; }
+.auth-form input { width: 100%; min-height: 39px; padding: 0 11px; border: 1px solid #e5e6dc; border-radius: 6px; background: #fff; color: #333a31; font: 11px var(--font-body); }
+.auth-form input::placeholder { color: #a2a69b; }
+.auth-form input:focus { border-color: #a5c677; outline: 3px solid #cfe2af65; }
+.oauth-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 14px 0 4px; }
+.oauth-button { display: inline-flex; min-width: 0; min-height: 36px; align-items: center; justify-content: center; gap: 7px; padding: 0 8px; border: 1px solid #e5e6dc; border-radius: 6px; background: #fff; color: #394037; cursor: pointer; font: 600 9px var(--font-body); }
+.oauth-button:hover { border-color: #cbd8b4; background: #fbfcf6; }
+.oauth-button:disabled { cursor: wait; opacity: .65; }
+.oauth-icon { display: inline-grid; width: 17px; height: 17px; flex: 0 0 auto; place-items: center; border-radius: 50%; font: 700 10px Arial, sans-serif; }
+.google-icon { color: #4285f4; }.facebook-icon { background: #1877f2; color: white; font-size: 13px; }.github-icon { color: #24292f; font-size: 8px; }.apple-icon { background: #151515; color: white; font-size: 8px; }
+.auth-divider { display: flex; align-items: center; gap: 9px; margin: 8px 0 12px; color: #92968d; font-size: 8px; }
+.auth-divider::before, .auth-divider::after { height: 1px; flex: 1; background: #ebeae3; content: ""; }
+.auth-feedback { display: none; margin: 2px 0 0; padding: 0; color: #a25143; font-size: 9px; line-height: 1.6; }
+.auth-feedback.visible { display: block; }
+.auth-feedback.error { padding: 8px 10px; border: 1px solid #f0d6d0; border-radius: 6px; background: #fff5f2; }
+.auth-submit { width: 100%; min-height: 38px; margin-top: 4px; font-size: 10px; }
+.auth-submit:disabled { cursor: wait; opacity: .68; }
+.auth-links { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 13px; color: #81867b; font-size: 9px; }
+.auth-link { padding: 3px; border: 0; background: transparent; color: #688545; cursor: pointer; font: 600 9px var(--font-body); }
+.auth-link:hover { color: #445d2a; text-decoration: underline; }
+.auth-link:disabled { cursor: wait; opacity: .65; }
+.auth-resend { justify-self: center; margin-top: 4px; }
+.auth-feedback.success { padding: 8px 10px; border: 1px solid #d9e8c7; border-radius: 6px; background: #f4f9ed; color: #526f39; }
+.auth-warning { padding: 10px 11px; border: 1px solid #ece9dc; border-radius: 7px; background: #faf8f0; color: #77796d; font-size: 9px; line-height: 1.65; }
+.auth-warning code, .auth-setup-list code { padding: 1px 4px; border-radius: 3px; background: #efeee7; font: 9px Consolas, monospace; }
+.auth-setup-details { margin-top: 10px; color: #656b60; font-size: 9px; }
+.auth-setup-details summary { cursor: pointer; font-weight: 700; }
+.auth-setup-details .auth-setup-list { margin-top: 9px; }
+.auth-setup-list { display: grid; gap: 9px; margin: 0 0 14px; padding-left: 18px; color: #656b60; font-size: 10px; line-height: 1.65; }
+.auth-setup-list strong { color: #454c42; }
+
+@media (min-width: 1500px) {
+  .main-content { margin-right: auto; margin-left: max(248px, calc((100vw - 1350px)/2)); }
+}
+@media (max-width: 1100px) {
+  .main-content { padding-right: 30px; padding-left: 30px; }
+  .sidebar { width: 220px; padding-right: 16px; padding-left: 16px; }
+  .main-content { margin-left: 220px; }
+  .welcome-section { padding-right: 28px; padding-left: 28px; }
+  .curriculum-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .sidebar { width: 260px; transform: translateX(-100%); transition: transform .2s; box-shadow: 8px 0 30px #17201630; }
+  .sidebar.is-open { transform: translateX(0); }
+  .main-content { margin-left: 0; padding-right: 19px; padding-left: 19px; }
+  .topbar { height: 57px; gap: 10px; }
+  .menu-toggle { display: grid !important; width: 29px; height: 29px; place-items: center; border: 1px solid #e6e5dd; border-radius: 6px; background: #fffefa; color: #60675b; cursor: pointer; }
+  .topbar { justify-content: flex-start; }.topbar-right { margin-left: auto; }
+  .topbar-caption { display: none; }
+  .account-label { max-width: 72px; }
+  .welcome-section { min-height: 212px; margin-top: 17px; padding: 24px 20px; }
+  .welcome-copy { width: 100%; }
+  .welcome-copy h1 { max-width: 440px; font-size: clamp(24px, 6vw, 32px); }
+  .welcome-copy p { max-width: 410px; font-size: 10px; }
+  .hero-art { position: absolute; right: -94px; bottom: -23px; width: 245px; opacity: .22; }
+  .stats-grid { gap: 8px; }
+  .stat-card { min-height: 64px; gap: 8px; padding: 9px; }
+  .stat-icon { width: 29px; height: 29px; }
+  .stat-info > span { font-size: 8px; }.stat-info strong { font-size: 10px; }
+  .stat-side-label, .level-pill { display: none; }
+  .section-heading { margin-top: 28px; }
+  .section-heading h2, .workspace-heading h2 { font-size: 17px; }
+  .page-heading { margin-top: 26px; }
+  .page-heading h2 { font-size: 21px; }
+  .section-heading.page-heading h2, .workspace-heading.page-heading h2 { font-size: 21px; }
+  .quiz-grid { gap: 9px; }
+  .workspace-section { margin-top: 29px; }
+}
+@media (max-width: 520px) {
+  .main-content { padding-right: 14px; padding-left: 14px; }
+  .breadcrumb { font-size: 10px; }
+  .topbar-right { gap: 8px; }
+  .account-button { gap: 0; padding-right: 3px; }
+  .account-label { display: none; }
+  .welcome-section { min-height: 205px; padding: 20px 16px; }
+  .welcome-copy h1 { font-size: 25px; }
+  .welcome-copy p { max-width: 320px; }
+  .curriculum-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+  .quiz-grid { grid-template-columns: 1fr; }
+  .quiz-page-card { padding: 14px; }
+  .course-card { min-height: 174px; padding: 12px 10px; }
+  .course-card h3 { font-size: 11px; }
+  .course-card p { font-size: 8px; }
+  .course-meta { font-size: 7px; }
+  .workspace-heading { align-items: flex-start; gap: 8px; }
+  .workspace-badge { max-width: 94px; line-height: 1.5; font-size: 7px; }
+  .editor-toolbar { padding-right: 6px; padding-left: 7px; }
+  .file-tab { padding: 0 4px; font-size: 8px; }.file-tab .tab-close { display: none; }
+  .language-picker-label { display: none; }#language-select { max-width: 80px; padding-left: 4px; font-size: 8px; }
+  .editor-actions { gap: 1px; }
+  .button-subtle { padding: 0 5px; font-size: 12px; }.button-subtle span { display: none; }
+  .button-run { padding: 0 7px; font-size: 8px; }
+  .editor-panes { grid-template-columns: 1fr; }
+  .code-pane { border-right: 0; border-bottom: 1px solid #ebeae4; }
+  .code-input-wrap { min-height: 162px; }.code-input-wrap #code-editor { min-height: 154px; }
+  .preview-pane { min-height: 390px; padding:10px 0 0; }
+  #preview-frame { width:100%; height:75dvh; min-height:480px; border-radius:12px; }
+  .premium-section { min-height: 145px; flex-wrap: wrap; gap: 9px; padding: 14px 12px 13px 77px; }
+  .premium-banner-art { width: 66px; }.pro-spark { top: 29px; left: 20px; font-size: 22px; }.pro-orbit { top: 22px; left: 7px; width: 52px; height: 52px; }
+  .premium-banner-copy h2 { font-size: 14px; }.premium-banner-copy p { font-size: 8px; }
+  .button-premium { margin-left: auto; }
+  .page-footer { gap: 8px; font-size: 7px; }
+  .dialog { padding: 22px 17px; }
+  .plan-grid { gap: 7px; }
+  .plan-card { padding: 12px 9px 9px; }
+  .plan-price { font-size: 16px; }
+  .plan-popular { position: static; order: -1; margin-bottom: -3px; }
+  .checkout-actions .button { padding: 0 8px; }
+  .lesson-item { gap: 7px; padding: 8px; }
+  .lesson-duration { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+
+/* Ruang kerja editor terpadu bergaya VS Code */
+.project-tabs{display:flex;align-items:center;gap:2px;margin-right:auto;margin-left:12px;min-width:0;overflow:hidden}
+.project-tab{padding:8px 10px;border-right:1px solid #343b43;color:#9ba5af;font-size:9px;white-space:nowrap}
+.project-tab.active{background:#242b33;color:#e4e9ee;border-top:2px solid #9ac151}
+.editor-card{background:#1e252c;border-color:#303943}
+.editor-toolbar{background:#252d35;border-color:#39434d;color:#e6eaf0}
+.file-tab{border:0;color:#e6eaf0}
+.code-pane{background:#1e252c;border-color:#39434d}
+.pane-heading{background:#252d35;border-color:#39434d;color:#aab4bf}
+.code-input-wrap-vscode{padding:0;min-height:360px;background:#1e252c}
+.CodeMirror{height:440px;width:100%;background:#1e252c;color:#d7dee7;font:13px/1.65 Consolas,Monaco,monospace}
+.CodeMirror-gutters{background:#1e252c;border-right:1px solid #303943}
+.CodeMirror-linenumber{color:#647180;padding:0 12px 0 8px}
+.CodeMirror-cursor{border-left:2px solid #d7e2ed}
+.CodeMirror-selected{background:#344454!important}
+.CodeMirror-focused .CodeMirror-selected{background:#344454!important}
+.CodeMirror-activeline-background{background:#252e37}
+.CodeMirror-matchingbracket{color:#c9f26b!important;border-bottom:1px solid #c9f26b}
+.editor-status{background:#252d35;border-color:#39434d;color:#aab4bf}
+.preview-pane{background:#e9eee9}
+@media(max-width:520px){#language-select{max-width:110px;min-width:78px;font-size:10px}.project-tabs{margin-left:3px}.project-tab{padding:8px 5px;font-size:7px}.CodeMirror{height:350px;font-size:12px}.code-input-wrap-vscode{min-height:350px}.preview-pane{width:100%;min-height:78dvh;padding:0 0 8px}.preview-pane #preview-frame{width:100%;height:75dvh;min-height:520px;border-radius:0}.preview-pane .pane-heading{min-height:42px}.preview-fullscreen-btn{padding:7px 10px;font-size:11px}}
+  
+/* L&P appearance controls */
+.lp-setting-button,#lp-language-select{min-height:34px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);padding:0 9px;font:600 11px var(--font-body);cursor:pointer}
+.lp-language-wrap{display:flex;align-items:center}#lp-language-select{max-width:145px;padding:0 7px}
+body.dark-mode{--ink:#edf0e8;--muted:#a3aa9f;--paper:#171c19;--card:#222a24;--line:#374139;--sidebar:#111713;--green:#b8df69;--green-deep:#c2e88a;color:var(--ink)}
+body.dark-mode .main-content,body.dark-mode{background:var(--paper);color:var(--ink)}
+body.dark-mode .stat-card,body.dark-mode .welcome-section,body.dark-mode .course-card,body.dark-mode .quiz-card,body.dark-mode .workspace-card,body.dark-mode .dialog,body.dark-mode .modal-backdrop{background:var(--card);color:var(--ink);border-color:var(--line)}
+body.dark-mode .topbar,body.dark-mode .section-heading,body.dark-mode .page-heading{color:var(--ink)}
+body.dark-mode p,body.dark-mode .stat-info>span,body.dark-mode .section-note{color:var(--muted)}
+body.dark-mode input,body.dark-mode textarea,body.dark-mode select{background:#19211b;color:var(--ink);border-color:var(--line)}
+@media(max-width:720px){.lp-setting-button{padding:0 7px;font-size:10px}#lp-language-select{max-width:105px;font-size:10px}.topbar-right{gap:6px}}
+
+
+/* Stability and dark-theme contrast refinements */
+body.dark-mode .welcome-section,
+body.dark-mode .stat-card,
+body.dark-mode .course-card,
+body.dark-mode .quiz-card,
+body.dark-mode .workspace-card,
+body.dark-mode .editor-card,
+body.dark-mode .lesson-content,
+body.dark-mode .content-card,
+body.dark-mode .practice-card,
+body.dark-mode .modal,
+body.dark-mode .dialog,
+body.dark-mode .dropdown-menu,
+body.dark-mode .settings-panel {
+  background-color: var(--card); color: var(--ink); border-color: var(--line);
+}
+body.dark-mode .topbar { background: var(--paper); border-color: var(--line); }
+body.dark-mode .section-note,
+body.dark-mode .muted,
+body.dark-mode .course-description,
+body.dark-mode .lesson-description { color: var(--muted); }
+body.dark-mode .lp-setting-button,
+body.dark-mode #lp-language-select { background: var(--card); color: var(--ink); border-color: var(--line); }
+#theme-toggle, #lp-language-select { touch-action: manipulation; }
+@media (max-width: 520px) {
+  .topbar-right { flex-wrap: wrap; justify-content: flex-end; }
+  #lp-language-select { max-width: 112px; min-width: 82px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#beranda" aria-label="Learning &amp; Programming, beranda">
+        <span class="brand-mark" aria-hidden="true"><span>L&amp;P</span></span>
+        <span>Learning <span class="brand-light">&amp; Programming</span></span>
+      </a>
+
+      <div class="sidebar-label">MENU UTAMA</div>
+      <nav class="main-nav" aria-label="Menu utama">
+        <a class="nav-link active" href="#beranda"><span class="nav-icon">⌂</span> Beranda</a>
+        <a class="nav-link" href="#materi"><span class="nav-icon">▤</span> Materi</a>
+        <a class="nav-link" href="#kuis"><span class="nav-icon">✦</span> Kuis</a>
+        <a class="nav-link" href="#arena"><span class="nav-icon">⌘</span> Arena Praktik</a>
+      </nav>
+
+      <div class="sidebar-label course-label">JALUR BELAJAR</div>
+      <div id="course-nav" class="course-nav"></div>
+
+      <a class="sidebar-premium" href="#premium">
+        <span class="premium-spark" aria-hidden="true">✳</span>
+        <span class="premium-title">Materi tingkat lanjut</span>
+        <span class="premium-copy">Kelas Pro memerlukan backend dan pembayaran.</span>
+        <span class="premium-link">Lihat info <span aria-hidden="true">↗</span></span>
+      </a>
+
+      <div class="sidebar-footer"><span class="online-dot"></span> Belajar kapan saja, gratis.</div>
+    </aside>
+
+    <main class="main-content" id="beranda">
+      <header class="topbar">
+        <button class="icon-button menu-toggle" id="menu-toggle" type="button" aria-label="Buka menu">☰</button>
+        <div class="breadcrumb">Ruang belajar <span>/</span> <strong>Beranda</strong></div>
+        <div class="topbar-right">
+          <button class="lp-setting-button" id="theme-toggle" type="button" aria-label="Aktifkan mode gelap"><span id="theme-icon">☾</span> <span id="theme-label">Gelap</span></button>
+          <label class="lp-language-wrap" for="lp-language-select"><select id="lp-language-select" aria-label="Pilih bahasa">
+            <option value="id">🇮🇩 Indonesia</option><option value="en">🇬🇧 English</option><option value="zh">🇨🇳 中文（简体）</option><option value="en-SG">🇸🇬 English (Singapore)</option><option value="ja">🇯🇵 日本語</option><option value="ru">🇷🇺 Русский</option><option value="ms">🇲🇾 Melayu</option><option value="ko">🇰🇷 한국어</option><option value="es">🇪🇸 Español</option><option value="fr">🇫🇷 Français</option>
+          </select></label>
+          <span class="topbar-caption">SEMANGAT BELAJAR!</span>
+          <span class="streak-badge" aria-label="Semangat belajar">✦ <span id="streak-count">0</span></span>
+          <button class="account-button" id="account-button" type="button" aria-label="Masuk atau lihat akun" title="Masuk atau lihat akun">
+            <span class="avatar" id="account-avatar" aria-hidden="true">K</span>
+            <span class="account-label" id="account-label">Masuk</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="welcome-section" data-page-panel="home">
+        <div class="welcome-copy">
+          <span class="eyebrow"><span class="eyebrow-dot"></span> KELAS PEMROGRAMAN WEB</span>
+          <h1>Halo, calon developer! <span class="wave" aria-hidden="true">✌</span><br>Siap bikin sesuatu <span class="highlight-text">hari ini?</span></h1>
+          <p>Belajar bikin website dari nol, satu langkah kecil dalam satu waktu. Materi, kuis, dan tempat praktik ada di sini.</p>
+          <a class="button button-primary" href="#materi">Lanjutkan belajar <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+          <div class="hero-code-card">
+            <div class="code-dots"><i></i><i></i><i></i><span>index.html</span></div>
+            <div class="code-lines">
+              <div><span class="line-no">01</span> <span class="code-purple">&lt;h1&gt;</span></div>
+              <div><span class="line-no">02</span> &nbsp;Halo, dunia!</div>
+              <div><span class="line-no">03</span> <span class="code-purple">&lt;/h1&gt;</span></div>
+              <div><span class="line-no">04</span> <span class="code-yellow">💡</span> <span class="code-green">ide pertamamu</span></div>
+            </div>
+          </div>
+          <span class="floating-chip chip-html">&lt;/&gt; HTML</span>
+          <span class="floating-chip chip-css">✳ CSS</span>
+          <span class="floating-chip chip-js">JS ✦</span>
+          <span class="hero-sparkle sparkle-one">✳</span><span class="hero-sparkle sparkle-two">✦</span>
+        </div>
+      </section>
+
+      <section class="stats-grid" data-page-panel="home" aria-label="Ringkasan progres">
+        <article class="stat-card">
+          <div class="stat-icon icon-purple">▤</div>
+          <div class="stat-info"><span>Materi selesai</span><strong><span id="completed-count">0</span><small> materi</small></strong></div>
+          <span class="stat-side-label">PROGRES</span>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon icon-yellow">✦</div>
+          <div class="stat-info"><span>Level saat ini</span><strong id="level-label">Pemula</strong></div>
+          <span class="level-pill">LEVEL <span id="level-number">01</span></span>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon icon-green">⌘</div>
+          <div class="stat-info"><span>Tempat praktik</span><strong>Editor langsung</strong></div>
+          <a class="stat-action" href="#arena" aria-label="Buka arena praktik">↗</a>
+        </article>
+      </section>
+
+      <div class="section-heading page-heading" id="materi" data-page-panel="materials">
+        <div><span class="eyebrow section-eyebrow">JALUR BELAJAR</span><h2>Belajar sesuai ritmemu</h2></div>
+        <span class="section-note"><span class="free-dot"></span> Dasar–menengah gratis <span id="premium-status-note"></span></span>
+      </div>
+
+      <section class="curriculum-grid" id="curriculum-grid" data-page-panel="materials" aria-label="Daftar jalur belajar"></section>
+
+      <section class="quiz-page" id="kuis" data-page-panel="quiz" aria-labelledby="quiz-page-title">
+        <div class="page-heading quiz-page-heading">
+          <div>
+            <span class="eyebrow section-eyebrow">UJI PEMAHAMAN</span>
+            <h2 id="quiz-page-title">Kuis singkat, langkah besar</h2>
+            <p>Pilih jawaban untuk setiap topik, lalu periksa hasilnya.</p>
+          </div>
+          <span class="section-note"><span class="free-dot"></span> Kuis tersedia setelah materi</span>
+        </div>
+        <div class="quiz-grid" id="quiz-grid"></div>
+      </section>
+
+      <section class="workspace-section" id="arena" data-page-panel="practice">
+        <div class="workspace-heading page-heading" id="editor">
+          <div><span class="eyebrow section-eyebrow">RUANG PRAKTIK</span><h2>Waktunya coba sendiri <span class="heading-spark">✳</span></h2>
+            <p>Pilih salah satu bahasa yang didukung, tulis kode, lalu jalankan di arena praktik.</p>
+          </div>
+          <span class="workspace-badge"><span class="live-dot"></span> 12 BAHASA ONLINE · AUTOSAVE</span>
+        </div>
+        <div class="editor-card">
+          <div class="editor-toolbar">
+            <div class="file-tab"><span class="file-icon">‹›</span> <span id="editor-file-name">index.html</span></div>
+            <label class="language-picker-label" for="language-select">Bahasa</label><select id="language-select" aria-label="Pilih bahasa pemrograman"><option value="html">HTML</option></select>
+            <div class="project-tabs" aria-label="File proyek"><span class="project-tab active">🌐 index.html</span><span class="project-tab">✳ styles.css</span><span class="project-tab">JS script.js</span></div>
+            <div class="editor-actions">
+              <button class="button button-subtle" id="runtime-settings" type="button" title="Atur koneksi runtime">⚙ <span>Koneksi</span></button>
+              <button class="button button-subtle" id="reset-code" type="button" title="Kembalikan kode contoh">↺ <span>Atur ulang</span></button>
+              <button class="button button-subtle" id="download-code" type="button" title="Simpan kode ke perangkat">↓ <span>Unduh file</span></button>
+              <button class="button button-run" id="run-code" type="button"><span>▶</span> Jalankan</button>
+            </div>
+          </div>
+          <div class="editor-panes">
+            <div class="code-pane">
+              <div class="pane-heading"><span>EDITOR KODE</span><span class="html-label" id="editor-language-label">HTML</span></div>
+              <div class="code-input-wrap code-input-wrap-vscode">
+                <textarea id="code-editor" aria-label="Editor proyek web" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+              </div>
+              <div class="editor-status"><span><i class="status-dot"></i><span id="editor-status-message">Siap untuk dijalankan</span></span><span id="editor-line-count">0 baris</span></div>
+            </div>
+            <div class="preview-pane">
+              <div class="pane-heading"><span>HASIL PREVIEW · TAMPILAN HP</span><button class="preview-fullscreen-btn" id="preview-fullscreen" type="button">⛶ Layar penuh</button></div>
+              <iframe id="preview-frame" title="Pratinjau hasil kode" sandbox="allow-scripts"></iframe>
+              <div class="preview-tip"><span>💡</span><span id="preview-tip-text">Output program tampil di sini. Runtime online tersedia untuk 12 bahasa.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="premium-section" id="premium" data-page-panel="home">
+        <div class="premium-banner-art" aria-hidden="true"><span class="pro-spark">✳</span><span class="pro-orbit"></span><span class="pro-cube">◆</span></div>
+        <div class="premium-banner-copy">
+          <span class="eyebrow pro-eyebrow">LANGKAH BERIKUTNYA</span>
+          <h2>Sudah siap melangkah lebih jauh?</h2>
+          <p>Kelas mahir dan pembayaran Pro memerlukan backend yang tidak disertakan pada versi satu file ini.</p>
+        </div>
+        <button class="button button-premium" id="premium-cta" type="button">Lihat info <span aria-hidden="true">→</span></button>
+      </section>
+
+      <footer class="page-footer"><a class="footer-brand" href="#beranda">{ } Learning &amp; Programming</a><span>Dibuat untuk belajar, selangkah demi selangkah. <span aria-hidden="true">✦</span></span></footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="dialog" id="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="Tutup">×</button>
+      <div id="dialog-content"></div>
+    </section>
+  </div>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script>
+const courses = [
+  {
+    id: "html",
+    icon: "</>",
+    iconMarkup: "&lt;/&gt;",
+    className: "html",
+    title: "Fondasi HTML",
+    level: "PEMULA",
+    description: "Kenali struktur halaman web dan susun konten pertamamu.",
+    lessons: [
+      { title: "Kenalan dengan dunia web", description: "Cara kerja website dan peran HTML, CSS, serta JavaScript.", minutes: 7 },
+      { title: "Struktur dokumen HTML", description: "Bangun kerangka halaman dengan elemen dan atribut.", minutes: 10 },
+      { title: "Teks, tautan, dan gambar", description: "Tambahkan judul, paragraf, tautan, serta gambar.", minutes: 12 },
+      { title: "Daftar dan tabel", description: "Tampilkan informasi dalam daftar dan tabel yang rapi.", minutes: 10 },
+      { title: "Formulir interaktif", description: "Buat formulir dengan label dan pilihan input.", minutes: 13 }
+    ],
+    quiz: {
+      question: "Apa fungsi utama HTML dalam sebuah halaman web?",
+      options: ["Mengatur struktur dan makna konten", "Mengatur warna dan tata letak saja", "Menyimpan data ke server"],
+      answer: 0,
+      explanation: "Betul! HTML memberi struktur dan makna pada konten halaman."
+    }
+  },
+  {
+    id: "css",
+    icon: "✳",
+    iconMarkup: "✳",
+    className: "css",
+    title: "Percantik dengan CSS",
+    level: "PEMULA",
+    description: "Atur warna, tipografi, jarak, dan layout halaman.",
+    lessons: [
+      { title: "Kenalan dengan CSS", description: "Aturan CSS, selector, dan tiga cara memasang style.", minutes: 8 },
+      { title: "Warna dan tipografi", description: "Pilih warna, ukuran teks, dan pasangan font.", minutes: 10 },
+      { title: "Box model dan jarak", description: "Pahami ukuran elemen, padding, margin, dan border.", minutes: 12 },
+      { title: "Layout dengan Flexbox", description: "Susun elemen sejajar dan buat navigasi sederhana.", minutes: 14 },
+      { title: "Grid dan desain responsif", description: "Susun grid dan sesuaikan tampilan untuk layar kecil.", minutes: 15 }
+    ],
+    quiz: {
+      question: "Properti CSS apa yang tepat untuk mengatur jarak di dalam sebuah elemen?",
+      options: ["margin", "padding", "display"],
+      answer: 1,
+      explanation: "Tepat! Padding mengatur jarak di dalam elemen, di antara konten dan border."
+    }
+  },
+  {
+    id: "js",
+    icon: "JS",
+    iconMarkup: "JS",
+    className: "js",
+    title: "JavaScript dasar",
+    level: "PEMULA",
+    description: "Tulis logika, gunakan variabel, dan buat program kecil.",
+    lessons: [
+      { title: "Variabel dan tipe data", description: "Kenali const, let, teks, angka, dan nilai boolean.", minutes: 10 },
+      { title: "Operator dan ekspresi", description: "Hitung, bandingkan, dan gabungkan beberapa nilai.", minutes: 10 },
+      { title: "Kondisi dan percabangan", description: "Gunakan if, else, dan switch untuk mengambil keputusan.", minutes: 12 },
+      { title: "Perulangan", description: "Ulangi pekerjaan dengan for dan while.", minutes: 12 },
+      { title: "Fungsi", description: "Pecah program menjadi fungsi yang dapat dipakai kembali.", minutes: 14 }
+    ],
+    quiz: {
+      question: "Kata kunci mana yang sebaiknya dipakai untuk nilai yang tidak perlu diubah?",
+      options: ["let", "var", "const"],
+      answer: 2,
+      explanation: "Benar! Gunakan const sebagai pilihan awal ketika sebuah nilai tidak perlu diubah."
+    }
+  },
+  {
+    id: "dom",
+    icon: "⌘",
+    iconMarkup: "⌘",
+    className: "dom",
+    title: "DOM dan interaksi",
+    level: "MENENGAH",
+    description: "Hubungkan JavaScript ke halaman dan respons aksi pengguna.",
+    lessons: [
+      { title: "Mengenal DOM", description: "Pahami representasi HTML yang bisa diakses dari JavaScript.", minutes: 9 },
+      { title: "Pilih dan ubah elemen", description: "Pilih elemen dan perbarui teks, atribut, atau class.", minutes: 13 },
+      { title: "Event dan event listener", description: "Tanggapi klik, input, dan aksi pengguna lainnya.", minutes: 14 },
+      { title: "Formulir dan validasi", description: "Ambil nilai formulir dan tampilkan pesan validasi.", minutes: 13 },
+      { title: "Proyek mini: daftar tugas", description: "Gabungkan event dan DOM untuk membuat daftar tugas.", minutes: 18 }
+    ],
+    quiz: {
+      question: "Metode mana yang bisa digunakan untuk menemukan elemen lewat selector CSS?",
+      options: ["document.querySelector()", "document.findStyle()", "window.getElement()"],
+      answer: 0,
+      explanation: "Benar! querySelector mencari elemen pertama yang cocok dengan selector CSS."
+    }
+  },
+  {
+    id: "data",
+    icon: "[]",
+    iconMarkup: "[]",
+    className: "data",
+    title: "Data dan debugging",
+    level: "MENENGAH",
+    description: "Kelola koleksi data dan temukan masalah dalam kode.",
+    lessons: [
+      { title: "Array dan method-nya", description: "Simpan kumpulan nilai dan olah dengan map, filter, serta find.", minutes: 14 },
+      { title: "Object dan properti", description: "Kelompokkan data terkait dalam object.", minutes: 12 },
+      { title: "JSON dan penyimpanan lokal", description: "Simpan data sederhana di browser menggunakan JSON dan localStorage.", minutes: 15 },
+      { title: "Membaca pesan error", description: "Gunakan console dan developer tools untuk mencari sumber masalah.", minutes: 12 },
+      { title: "Asynchronous JavaScript", description: "Pahami Promise, async/await, dan alur kerja asinkron.", minutes: 16 }
+    ],
+    quiz: {
+      question: "Method array apa yang menghasilkan array baru berisi elemen yang lolos suatu kondisi?",
+      options: ["filter()", "push()", "forEach()"],
+      answer: 0,
+      explanation: "Betul! filter() membuat array baru berisi semua elemen yang lolos tes."
+    }
+  },
+  {
+    id: "project",
+    icon: "↗",
+    iconMarkup: "↗",
+    className: "project",
+    title: "Proyek web pertama",
+    level: "MENENGAH",
+    description: "Rangkai HTML, CSS, dan JavaScript jadi satu portofolio.",
+    lessons: [
+      { title: "Rencanakan halaman portofolio", description: "Tentukan tujuan, susunan konten, dan sketsa halaman.", minutes: 10 },
+      { title: "Bangun struktur dan navigasi", description: "Buat halaman semantik yang mudah digunakan.", minutes: 16 },
+      { title: "Gaya responsif dan aksesibel", description: "Tata letak adaptif, kontras warna, dan fokus keyboard.", minutes: 17 },
+      { title: "Tambah interaksi dan publikasi", description: "Tambahkan JavaScript dan siapkan proyek untuk dibagikan.", minutes: 18 }
+    ],
+    quiz: {
+      question: "Praktik mana yang membantu website lebih mudah diakses pengguna keyboard?",
+      options: ["Menghapus outline pada semua tombol", "Menyediakan fokus visual yang jelas pada elemen interaktif", "Menggunakan warna saja untuk memberi tahu status"],
+      answer: 1,
+      explanation: "Tepat! Fokus yang terlihat membantu pengguna keyboard mengetahui posisi mereka."
+    }
+  },
+  {
+    id: "advanced",
+    icon: "✦",
+    iconMarkup: "✦",
+    className: "advanced",
+    title: "Developer tingkat lanjut",
+    level: "PRO",
+    description: "API, modul, workflow profesional, dan tantangan proyek nyata.",
+    locked: true,
+    lessons: [
+      { title: "Mengonsumsi REST API", description: "Ambil data dari layanan web memakai fetch dan kelola respons API.", minutes: 22 },
+      { title: "Modul dan arsitektur proyek", description: "Pecah program ke modul, atur struktur folder, dan kelola dependensi.", minutes: 25 },
+      { title: "Git dan workflow developer", description: "Lacak perubahan dan kerjakan fitur dalam alur kerja tim.", minutes: 20 },
+      { title: "Keamanan web dasar", description: "Kenali validasi, risiko umum, dan cara menangani masukan pengguna.", minutes: 24 },
+      { title: "Proyek akhir: aplikasi data", description: "Rancang dan bangun aplikasi web menggunakan API publik.", minutes: 35 }
+    ]
+  }
+];
+
+const lessonMaterials = {
+  html: [
+    {
+      explanation: "Browser membaca HTML untuk mengetahui bagian mana yang merupakan judul, paragraf, atau tautan. HTML memberi struktur dan arti pada konten; CSS mengatur tampilannya dan JavaScript menambahkan perilaku. Elemen umumnya ditulis dengan tag pembuka dan penutup.",
+      example: '<h1>Halo, dunia!</h1>\n<p>Ini paragraf pertamaku.</p>',
+      challenge: "Ubah contoh menjadi halaman perkenalan dengan nama dan satu hobi."
+    },
+    {
+      explanation: "Dokumen HTML lengkap diawali <!doctype html> agar browser menggunakan standar modern. Elemen <head> berisi informasi halaman, sedangkan konten yang terlihat berada di dalam <body>. Atribut lang menyatakan bahasa halaman.",
+      example: '<!doctype html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <title>Halaman pertamaku</title>\n</head>\n<body>\n  <h1>Halo!</h1>\n</body>\n</html>',
+      challenge: "Tambahkan paragraf ke body dan ganti judul halaman."
+    },
+    {
+      explanation: "Gunakan <h1> sampai <h6> untuk hierarki judul, bukan sekadar mengubah ukuran teks. Tautan memakai <a href=\"...\"> dan gambar memakai <img src=\"...\" alt=\"...\">. Teks alt menjelaskan gambar bagi pembaca layar atau saat gambar gagal dimuat.",
+      example: '<h1>Catatan Perjalananku</h1>\n<p>Hari ini aku pergi ke pantai.</p>\n<a href="https://example.com">Baca cerita lain</a>\n<img src="pantai.jpg" alt="Pantai saat senja">',
+      challenge: "Buat judul artikel, paragraf, dan tautan ke halaman yang kamu sukai."
+    },
+    {
+      explanation: "Daftar tidak berurutan memakai <ul>, daftar berurutan memakai <ol>, dan butirnya dibungkus <li>. Gunakan tabel dengan <th> untuk judul kolom dan <td> untuk isi data. Hindari tabel hanya untuk mengatur tampilan.",
+      example: '<ul>\n  <li>Riset ide</li>\n  <li>Menulis kode</li>\n</ul>\n<table>\n  <tr><th>Bahasa</th><th>Fungsi</th></tr>\n  <tr><td>HTML</td><td>Struktur</td></tr>\n</table>',
+      challenge: "Buat daftar tiga hal yang ingin kamu pelajari."
+    },
+    {
+      explanation: "Formulir mengumpulkan masukan pengguna. Pasangkan <label> dengan id input yang sama agar kolom punya nama yang jelas. Atribut type, name, dan required membantu browser memahami dan memeriksa isian.",
+      example: '<form>\n  <label for="nama">Namamu</label>\n  <input id="nama" name="nama" type="text" required>\n  <button type="submit">Kirim</button>\n</form>',
+      challenge: "Tambahkan kolom email dengan label yang terhubung dan isian wajib."
+    }
+  ],
+  css: [
+    {
+      explanation: "CSS mengatur tampilan elemen HTML. Sebuah aturan terdiri dari selector yang memilih elemen, lalu deklarasi dalam kurung kurawal. Tiap deklarasi berisi properti dan nilai; titik koma memisahkannya.",
+      example: 'p {\n  color: #526b32;\n  font-size: 18px;\n}',
+      challenge: "Ubah warna paragraf dan besarkan teksnya."
+    },
+    {
+      explanation: "Warna dapat ditulis sebagai hex atau rgb(). Ukuran teks dapat memakai px atau rem. Atur font cadangan dalam font-family agar teks tetap terbaca jika font utama tak tersedia.",
+      example: 'body {\n  color: #293428;\n  font-family: Arial, sans-serif;\n}\nh1 {\n  color: rgb(92, 125, 53);\n  font-size: 2rem;\n}',
+      challenge: "Pilih warna teks dan atur ukuran judul dalam rem."
+    },
+    {
+      explanation: "Box model terdiri dari konten, padding di dalam border, border, lalu margin di luarnya. Dengan box-sizing: border-box, ukuran yang ditentukan mencakup padding dan border sehingga layout lebih mudah dihitung.",
+      example: '* { box-sizing: border-box; }\n.kartu {\n  padding: 20px;\n  margin: 16px 0;\n  border: 1px solid #ddd;\n  border-radius: 12px;\n}',
+      challenge: "Tambahkan ruang dalam dan sudut membulat pada sebuah kartu."
+    },
+    {
+      explanation: "Flexbox menyusun elemen dalam satu dimensi, baris atau kolom. Pasang display: flex pada induknya. Gunakan gap untuk jarak, justify-content untuk arah utama, serta align-items untuk arah silang.",
+      example: '.menu {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n}',
+      challenge: "Susun dua tautan navigasi dalam satu baris dengan jarak di antaranya."
+    },
+    {
+      explanation: "CSS Grid cocok untuk layout baris dan kolom sekaligus. Gunakan grid-template-columns untuk menentukan kolom. Media query menerapkan aturan pada kondisi layar tertentu agar halaman beradaptasi dengan ponsel.",
+      example: '.kumpulan-kartu {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 16px;\n}\n@media (max-width: 600px) {\n  .kumpulan-kartu { grid-template-columns: 1fr; }\n}',
+      challenge: "Ubah grid menjadi satu kolom saat lebar layar kecil."
+    }
+  ],
+  js: [
+    {
+      explanation: "Variabel memberi nama pada nilai. Gunakan const jika nilainya tidak akan ditetapkan ulang dan let jika memang akan berubah. Tipe nilai mencakup string untuk teks, number untuk angka, dan boolean untuk true atau false.",
+      example: 'const nama = "Alya";\nlet jumlahProyek = 1;\njumlahProyek = jumlahProyek + 1;\nconsole.log(nama, jumlahProyek);',
+      challenge: "Buat variabel nama dan kota, lalu tampilkan keduanya dengan console.log."
+    },
+    {
+      explanation: "Operator +, -, *, dan / mengolah angka. Perbandingan === menghasilkan boolean dengan membandingkan nilai sekaligus tipenya. Operator + juga bisa menggabungkan string.",
+      example: 'const harga = 12000;\nconst jumlah = 2;\nconst total = harga * jumlah;\nconst cukup = total <= 25000;\nconsole.log(total, cukup);',
+      challenge: "Hitung total belanja dari harga dan jumlah pilihanmu."
+    },
+    {
+      explanation: "Percabangan menjalankan kode berbeda sesuai kondisi. Blok if dijalankan saat kondisi true; else menyediakan pilihan jika tidak. Rangkai kondisi lain dengan else if.",
+      example: 'const nilai = 82;\nif (nilai >= 75) {\n  console.log("Lulus");\n} else {\n  console.log("Belajar lagi");\n}',
+      challenge: "Ubah batas nilai dan tambahkan pesan khusus untuk nilai sempurna."
+    },
+    {
+      explanation: "Perulangan menjalankan blok kode berulang. for berguna saat jumlah pengulangan diketahui; while berulang selama kondisinya true. Pastikan kondisi while berubah agar perulangan bisa berhenti.",
+      example: 'for (let nomor = 1; nomor <= 3; nomor++) {\n  console.log("Langkah", nomor);\n}',
+      challenge: "Ubah perulangan agar menampilkan nomor 1 sampai 5."
+    },
+    {
+      explanation: "Fungsi membungkus langkah yang bisa dipanggil kembali. Parameter menerima masukan, sedangkan return mengirimkan hasil keluar dari fungsi. Fungsi panah adalah bentuk ringkas untuk banyak fungsi JavaScript.",
+      example: 'function sapa(nama) {\n  return `Halo, ${nama}!`;\n}\nconsole.log(sapa("Dina"));',
+      challenge: "Buat fungsi yang menerima dua angka dan mengembalikan jumlahnya."
+    }
+  ],
+  dom: [
+    {
+      explanation: "DOM adalah representasi halaman yang browser buat dari HTML. JavaScript dapat menemukan dan mengubah elemen DOM sehingga halaman merespons tindakan pengguna tanpa dimuat ulang.",
+      example: '<h1 id="judul">Versi pertama</h1>\n<script>\n  document.querySelector("#judul").textContent = "Versi baru";\n<\/script>',
+      challenge: "Ganti teks judul dengan kalimat pilihanmu."
+    },
+    {
+      explanation: "querySelector() memilih elemen pertama yang cocok dengan selector CSS; querySelectorAll() memilih semua yang cocok. Setelah menemukan elemen, ubah textContent, classList, atau atributnya.",
+      example: '<p class="status">Belum dimulai</p>\n<script>\n  const status = document.querySelector(".status");\n  status.classList.add("aktif");\n  status.textContent = "Sedang belajar";\n<\/script>',
+      challenge: "Pilih elemen berdasarkan id, lalu ubah isi teksnya."
+    },
+    {
+      explanation: "Event adalah kejadian seperti klik atau pengetikan. addEventListener memasang fungsi yang dipanggil browser ketika event terjadi. Cara ini memisahkan perilaku JavaScript dari markup.",
+      example: '<button id="tombol">Klik aku</button>\n<p id="hasil"></p>\n<script>\n  document.querySelector("#tombol").addEventListener("click", () => {\n    document.querySelector("#hasil").textContent = "Berhasil!";\n  });\n<\/script>',
+      challenge: "Tambahkan event klik yang memperbarui pesan pada halaman."
+    },
+    {
+      explanation: "Tangani event submit pada form dan baca nilai input melalui value. Panggil preventDefault() agar halaman tidak dimuat ulang. Periksa isian, kemudian beri umpan balik yang berguna.",
+      example: '<form id="form"><input id="nama" required><button>Kirim</button></form>\n<p id="pesan"></p>\n<script>\n  document.querySelector("#form").addEventListener("submit", event => {\n    event.preventDefault();\n    document.querySelector("#pesan").textContent = "Halo, " + document.querySelector("#nama").value;\n  });\n<\/script>',
+      challenge: "Tampilkan sapaan setelah pengguna mengirim namanya."
+    },
+    {
+      explanation: "Daftar tugas menyatukan input, event, dan pembuatan elemen. Buat li dengan document.createElement(), isi menggunakan textContent, lalu tambahkan ke ul dengan append().",
+      example: '<ul id="daftar"></ul>\n<script>\n  const tugas = document.createElement("li");\n  tugas.textContent = "Latihan DOM";\n  document.querySelector("#daftar").append(tugas);\n<\/script>',
+      challenge: "Buat li berisi kegiatan lalu tambahkan ke daftar HTML."
+    }
+  ],
+  data: [
+    {
+      explanation: "Array menyimpan urutan nilai. push() menambah nilai; map() membuat array baru dengan mengubah item; filter() memilih item yang memenuhi syarat; find() mencari item pertama yang cocok.",
+      example: 'const angka = [1, 2, 3, 4];\nconst genap = angka.filter(n => n % 2 === 0);\nconsole.log(genap); // [2, 4]',
+      challenge: "Filter sebuah array agar hanya berisi angka lebih dari 10."
+    },
+    {
+      explanation: "Object menyimpan pasangan properti dan nilai. Gunakan tanda titik atau kurung siku untuk membaca properti. Nilainya dapat berupa teks, angka, array, bahkan fungsi.",
+      example: 'const siswa = { nama: "Bima", level: "menengah" };\nconsole.log(siswa.nama);\nsiswa.proyek = "Portofolio";',
+      challenge: "Buat object buku dengan properti judul dan penulis."
+    },
+    {
+      explanation: "JSON adalah format teks untuk pertukaran data. JSON.stringify() mengubah data JavaScript menjadi teks dan JSON.parse() membacanya kembali. localStorage menyimpan teks di browser untuk penggunaan berikutnya pada perangkat yang sama.",
+      example: 'const profil = { nama: "Sari" };\nlocalStorage.setItem("profil", JSON.stringify(profil));\nconst data = JSON.parse(localStorage.getItem("profil"));\nconsole.log(data.nama);',
+      challenge: "Simpan nama panggilan ke localStorage lalu tampilkan kembali."
+    },
+    {
+      explanation: "Pesan error sering menyebut jenis masalah, file, dan baris yang terlibat. Buka Developer Tools dan tab Console. Baca pesannya sebelum mengubah kode; tambahkan console.log sementara untuk mengamati nilai.",
+      example: 'const jumlah = 2;\nconsole.log("jumlah:", jumlah);\n// Jika muncul error, periksa pesan dan baris yang disebutnya.',
+      challenge: "Buka Console browser dan amati apa yang terjadi jika nama variabel salah eja."
+    },
+    {
+      explanation: "Operasi asinkron menunggu pekerjaan seperti mengambil data tanpa menghentikan halaman. fetch() mengembalikan Promise. Dalam fungsi async, await menunggu hasil, lalu respons dapat diubah menjadi JSON.",
+      example: 'async function ambilData() {\n  const response = await fetch("https://jsonplaceholder.typicode.com/todos/1");\n  const data = await response.json();\n  console.log(data.title);\n}',
+      challenge: "Coba fungsi ini dengan koneksi internet dan tampilkan judul yang diterima."
+    }
+  ],
+  project: [
+    {
+      explanation: "Proyek yang baik dimulai dengan tujuan pengguna, konten, dan sketsa. Tentukan bagian halaman sebelum menulis kode, misalnya navigasi, perkenalan, daftar proyek, dan kontak.",
+      example: '<!-- Rencana halaman: -->\n<!-- 1. Navigasi  2. Tentang  3. Proyek  4. Kontak -->',
+      challenge: "Tulis tiga bagian yang ingin kamu sertakan di portofoliomu."
+    },
+    {
+      explanation: "Pilih elemen semantik seperti <header>, <nav>, <main>, <section>, dan <footer> sesuai peran kontennya. Gunakan satu judul utama h1 dan teks tautan yang menjelaskan tujuan.",
+      example: '<header><nav><a href="#proyek">Lihat proyek</a></nav></header>\n<main>\n  <section id="proyek"><h1>Portofolioku</h1></section>\n</main>\n<footer>Hubungi saya</footer>',
+      challenge: "Buat kerangka portofolio dengan header, main, section proyek, dan footer."
+    },
+    {
+      explanation: "Mulai dengan layout sederhana, lalu gunakan media query untuk menyesuaikan kolom pada layar sempit. Aksesibilitas mencakup kontras yang cukup, label jelas, alt pada gambar informatif, dan fokus keyboard yang terlihat.",
+      example: '.proyek { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }\n@media (max-width: 600px) { .proyek { grid-template-columns: 1fr; } }\n:focus-visible { outline: 3px solid #678d35; }',
+      challenge: "Tambahkan media query satu kolom dan gaya fokus keyboard pada tombol."
+    },
+    {
+      explanation: "Gunakan JavaScript untuk interaksi yang membantu pengguna. Sebelum membagikan proyek, uji tautan, tampilan mobile, Console, dan navigasi keyboard. Hosting statis membuat halaman dapat diakses lewat tautan.",
+      example: 'document.querySelector("#kontak").addEventListener("click", () => {\n  document.querySelector("#pesan").textContent = "Senang berkenalan!";\n});',
+      challenge: "Uji proyek pada layar kecil dan perbaiki satu hal yang kamu temukan."
+    }
+  ]
+};
+
+const starterCode = `<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halaman pertamaku</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 32px; color: #293428; background: #f7f9f2; }
+    .kartu { max-width: 420px; padding: 24px; border-radius: 16px; background: white; box-shadow: 0 8px 24px #25301914; }
+    h1 { color: #64813b; }
+    button { padding: 10px 16px; border: 0; border-radius: 8px; background: #c9f26b; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="kartu">
+    <h1>Halo, dunia! 👋</h1>
+    <p>Ini website pertamaku. Yuk, ubah dan jadikan milikmu!</p>
+    <button onclick="this.textContent = 'Berhasil! 🎉'">Klik aku!</button>
+  </div>
+</body>
+</html>`;
+
+const languageCatalog = {
+  html: { name: "HTML", extension: "html", runnable: true, starter: starterCode },
+  css: { name: "CSS", extension: "css", runnable: true, starter: "body {\n  font-family: system-ui, sans-serif;\n  padding: 2rem;\n  color: #293428;\n  background: #f7f9f2;\n}\n\nh1 {\n  color: #64813b;\n}" },
+  javascript: { name: "JavaScript", extension: "js", runnable: true, starter: 'const pesan = "Halo, dunia!";\nconsole.log(pesan);' },
+  typescript: { name: "TypeScript", extension: "ts", starter: 'const pesan: string = "Halo, dunia!";\nconsole.log(pesan);' },
+  python: { name: "Python", extension: "py", starter: 'nama = "Dunia"\nprint(f"Halo, {nama}!")' },
+  java: { name: "Java", extension: "java", starter: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Halo, dunia!");\n    }\n}' },
+  c: { name: "C", extension: "c", starter: '#include <stdio.h>\n\nint main(void) {\n    printf("Halo, dunia!\\n");\n    return 0;\n}' },
+  cpp: { name: "C++", extension: "cpp", starter: '#include <iostream>\n\nint main() {\n    std::cout << "Halo, dunia!" << std::endl;\n    return 0;\n}' },
+  csharp: { name: "C#", extension: "cs", starter: 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Halo, dunia!");\n    }\n}' },
+  php: { name: "PHP", extension: "php", starter: '<?php\n$pesan = "Halo, dunia!";\necho $pesan . PHP_EOL;\n' },
+  ruby: { name: "Ruby", extension: "rb", starter: 'pesan = "Halo, dunia!"\nputs pesan' },
+  go: { name: "Go", extension: "go", starter: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Halo, dunia!")\n}' },
+  rust: { name: "Rust", extension: "rs", starter: 'fn main() {\n    println!("Halo, dunia!");\n}' },
+  kotlin: { name: "Kotlin", extension: "kt", starter: 'fun main() {\n    println("Halo, dunia!")\n}' },
+  swift: { name: "Swift", extension: "swift", starter: 'let pesan = "Halo, dunia!"\nprint(pesan)' },
+  dart: { name: "Dart", extension: "dart", starter: 'void main() {\n  print("Halo, dunia!");\n}' },
+  sql: { name: "SQL", extension: "sql", starter: 'SELECT \'Halo, dunia!\' AS pesan;\n\n-- Coba ubah teks di atas.' },
+  bash: { name: "Bash", extension: "sh", starter: '#!/usr/bin/env bash\npesan="Halo, dunia!"\necho "$pesan"' },
+  powershell: { name: "PowerShell", extension: "ps1", starter: '$pesan = "Halo, dunia!"\nWrite-Output $pesan' },
+  r: { name: "R", extension: "R", starter: 'pesan <- "Halo, dunia!"\nprint(pesan)' },
+  scala: { name: "Scala", extension: "scala", starter: 'object Main extends App {\n  println("Halo, dunia!")\n}' },
+  lua: { name: "Lua", extension: "lua", starter: 'local pesan = "Halo, dunia!"\nprint(pesan)' },
+  perl: { name: "Perl", extension: "pl", starter: 'use strict;\nuse warnings;\n\nmy $pesan = "Halo, dunia!";\nprint "$pesan\\n";' },
+  haskell: { name: "Haskell", extension: "hs", starter: 'main :: IO ()\nmain = putStrLn "Halo, dunia!"' },
+  elixir: { name: "Elixir", extension: "exs", starter: 'pesan = "Halo, dunia!"\nIO.puts(pesan)' },
+  clojure: { name: "Clojure", extension: "clj", starter: '(println "Halo, dunia!")' },
+  objectivec: { name: "Objective-C", extension: "m", starter: '#import <Foundation/Foundation.h>\n\nint main(void) {\n    @autoreleasepool {\n        NSLog(@"Halo, dunia!");\n    }\n    return 0;\n}' },
+  assembly: { name: "Assembly", extension: "asm", starter: '; Contoh x86-64 (NASM, Linux)\nsection .data\n    pesan db "Halo, dunia!", 10\n    panjang equ $ - pesan\n\nsection .text\nglobal _start\n_start:\n    mov rax, 1\n    mov rdi, 1\n    mov rsi, pesan\n    mov rdx, panjang\n    syscall\n    mov rax, 60\n    xor rdi, rdi\n    syscall' },
+  solidity: { name: "Solidity", extension: "sol", starter: '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract HaloDunia {\n    string public pesan = "Halo, dunia!";\n}' },
+  json: { name: "JSON", extension: "json", runnable: true, starter: '{\n  "pesan": "Halo, dunia!",\n  "belajar": true\n}' },
+  markdown: { name: "Markdown", extension: "md", starter: '# Halo, dunia!\n\nIni **teks tebal** dan ini *teks miring*.\n\n- Belajar\n- Berlatih\n- Berkarya' },
+  yaml: { name: "YAML", extension: "yaml", starter: 'aplikasi:\n  nama: KodeKita\n  belajar: true\n  topik:\n    - HTML\n    - JavaScript' },
+  xml: { name: "XML", extension: "xml", starter: '<?xml version="1.0" encoding="UTF-8"?>\n<pesan>\n  <teks>Halo, dunia!</teks>\n</pesan>' },
+  jsx: { name: "React JSX", extension: "jsx", starter: 'function App() {\n  return <h1>Halo, dunia!</h1>;\n}\n\nexport default App;' },
+  text: { name: "Teks bebas", extension: "txt", starter: "Tulis kode atau catatanmu di sini." }
+};
+
+const STORAGE_KEYS = {
+  completed: "kodekita-completed-v1",
+  code: "kodekita-editor-v1",
+  files: "kodekita-editor-files-v1",
+  language: "kodekita-editor-language-v1"
+};
+
+try {
+  const savedSupabaseConfig = JSON.parse(localStorage.getItem("kodekita-supabase-public-config-v1") || "null");
+  localStorage.removeItem("kodekita-supabase-public-config-v1");
+  if (typeof savedSupabaseConfig?.url === "string") {
+    const projectRef = new URL(savedSupabaseConfig.url).hostname.split(".")[0];
+    if (/^[a-z0-9-]+$/i.test(projectRef)) localStorage.removeItem(`sb-${projectRef}-auth-token`);
+  }
+} catch (error) {
+  console.error("Tidak dapat menghapus sesi Supabase lokal lama:", error);
+}
+
+let completedLessons = loadCompletedLessons();
+let lastDialogTrigger = null;
+let selectedLanguage = "html";
+let codeMirrorEditor = null;
+let editorFiles = {};
+let activePage = "home";
+
+const courseNav = document.querySelector("#course-nav");
+const curriculumGrid = document.querySelector("#curriculum-grid");
+const quizGrid = document.querySelector("#quiz-grid");
+const completedCount = document.querySelector("#completed-count");
+const levelLabel = document.querySelector("#level-label");
+const levelNumber = document.querySelector("#level-number");
+const streakCount = document.querySelector("#streak-count");
+const premiumStatusNote = document.querySelector("#premium-status-note");
+const editor = document.querySelector("#code-editor");
+const languageSelect = document.querySelector("#language-select");
+const lineNumbers = document.querySelector("#line-numbers");
+const previewFrame = document.querySelector("#preview-frame");
+const editorFileName = document.querySelector("#editor-file-name");
+const editorLanguageLabel = document.querySelector("#editor-language-label");
+const editorStatusMessage = document.querySelector("#editor-status-message");
+const previewTipText = document.querySelector("#preview-tip-text");
+const modalBackdrop = document.querySelector("#modal-backdrop");
+const dialogContent = document.querySelector("#dialog-content");
+
+function loadCompletedLessons() {
+  try {
+    const value = JSON.parse(localStorage.getItem(STORAGE_KEYS.completed) || "[]");
+    return Array.isArray(value) ? value.filter(item => typeof item === "string") : [];
+  } catch (error) {
+    console.error("Tidak dapat membaca progres belajar:", error);
+    return [];
+  }
+}
+
+function saveCompletedLessons() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(completedLessons));
+  } catch (error) {
+    console.error("Tidak dapat menyimpan progres belajar:", error);
+  }
+}
+
+function hasPremiumAccess() {
+  return false;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+function renderCourses() {
+  courseNav.innerHTML = courses.map(course => `
+    <a class="course-link${course.locked && !hasPremiumAccess() ? " locked" : ""}" href="${course.locked && !hasPremiumAccess() ? "#premium" : `#course-${course.id}`}"
+       ${course.locked && !hasPremiumAccess() ? 'data-premium="true"' : `data-course="${course.id}"`}>
+      <span class="course-marker" aria-hidden="true"></span>${escapeHTML(course.title)}
+      ${course.locked && !hasPremiumAccess() ? '<span class="lock-icon" aria-label="Materi berbayar">⌑</span>' : ""}
+    </a>`).join("");
+
+  curriculumGrid.innerHTML = courses.map(course => {
+    const progress = course.lessons.filter((_, index) => completedLessons.includes(`${course.id}-${index}`)).length;
+    const percentage = Math.round((progress / course.lessons.length) * 100);
+    const isLocked = course.locked && !hasPremiumAccess();
+    return `
+      <article class="course-card tone-${course.className}${isLocked ? " course-locked" : ""}" id="course-${course.id}">
+        <div class="course-card-top">
+          <div class="course-icon" aria-hidden="true">${course.iconMarkup}</div>
+          <span class="course-level">${course.level}</span>
+        </div>
+        <h3>${escapeHTML(course.title)}</h3>
+        <p>${escapeHTML(course.description)}</p>
+        <div class="course-meta"><span>${course.lessons.length} materi <span aria-hidden="true">·</span> ${course.quiz ? "kuis" : "proyek akhir"}</span><strong>${progress}/${course.lessons.length} selesai</strong></div>
+        <div class="course-progress" aria-label="Progres ${percentage}%"><div class="course-progress-fill" style="width: ${percentage}%"></div></div>
+        <button class="course-open" type="button" data-course="${course.id}" aria-label="${isLocked ? "Lihat kelas Pro" : `Buka ${course.title}`}"></button>
+        ${isLocked ? '<div class="locked-overlay" aria-hidden="true"><span>⌑</span> KHUSUS PRO</div>' : ""}
+      </article>`;
+  }).join("");
+
+  updateStats();
+  renderQuizzes();
+}
+
+function renderQuizzes() {
+  quizGrid.innerHTML = courses.filter(course => course.quiz).map(course => {
+    const isLocked = course.locked && !hasPremiumAccess();
+    if (isLocked) {
+      return `
+        <article class="quiz-page-card quiz-page-card-locked tone-${course.className}">
+          <div class="quiz-card-top"><span class="quiz-course-icon">${course.iconMarkup}</span><span class="course-level">${course.level}</span></div>
+          <h3>${escapeHTML(course.title)}</h3>
+          <p class="quiz-question">Kuis tersedia bersama materi khusus Pro.</p>
+          <button class="button button-subtle quiz-access" type="button" data-course="${course.id}">Lihat akses Pro <span aria-hidden="true">→</span></button>
+        </article>`;
+    }
+
+    return `
+      <article class="quiz-page-card tone-${course.className}" data-quiz-card data-course-id="${course.id}">
+        <div class="quiz-card-top"><span class="quiz-course-icon">${course.iconMarkup}</span><span class="course-level">${course.level}</span></div>
+        <h3>${escapeHTML(course.title)}</h3>
+        <p class="quiz-question">${escapeHTML(course.quiz.question)}</p>
+        <div class="quiz-options">${course.quiz.options.map((option, index) =>
+          `<button class="quiz-option" type="button" data-page-answer="${index}">${escapeHTML(option)}</button>`
+        ).join("")}</div>
+        <p class="quiz-feedback" data-quiz-feedback aria-live="polite"></p>
+        <div class="quiz-actions">
+          <button class="quiz-start" type="button" data-check-page-quiz disabled>Periksa jawaban</button>
+          <span class="quiz-status" data-quiz-status></span>
+        </div>
+      </article>`;
+  }).join("");
+
+}
+
+function updatePage() {
+  const hash = window.location.hash.slice(1);
+  const page = hash.startsWith("course-") || hash === "kurikulum"
+    ? "materials"
+    : ({ materi: "materials", kuis: "quiz", arena: "practice", editor: "practice" }[hash] || "home");
+  activePage = page;
+  document.querySelectorAll("[data-page-panel]").forEach(panel => {
+    panel.hidden = panel.dataset.pagePanel !== page;
+  });
+
+  const pageLabels = { home: "Beranda", materials: "Materi", quiz: "Kuis", practice: "Arena Praktik" };
+  document.querySelector(".breadcrumb strong").textContent = pageLabels[page];
+  document.querySelectorAll(".main-nav .nav-link").forEach(link => {
+    const linkPage = {
+      "#beranda": "home",
+      "#materi": "materials",
+      "#kuis": "quiz",
+      "#arena": "practice"
+    }[link.getAttribute("href")];
+    link.classList.toggle("active", linkPage === page);
+  });
+
+  if (page === "quiz") renderQuizzes();
+  const targetId = hash && document.getElementById(hash) ? hash : "";
+  window.requestAnimationFrame(() => {
+    if (targetId) document.getElementById(targetId)?.scrollIntoView({ block: "start" });
+    else window.scrollTo(0, 0);
+  });
+}
+
+function updateStats() {
+  const totalFreeLessons = courses.filter(course => !course.locked).reduce((sum, course) => sum + course.lessons.length, 0);
+  const completedFree = completedLessons.filter(key => courses.some(course => !course.locked && key.startsWith(`${course.id}-`))).length;
+  completedCount.textContent = completedFree;
+  const level = completedFree >= 20 ? 4 : completedFree >= 10 ? 3 : completedFree >= 4 ? 2 : 1;
+  const names = ["Pemula", "Pelajar", "Perakit", "Developer"];
+  levelLabel.textContent = names[level - 1];
+  levelNumber.textContent = String(level).padStart(2, "0");
+  streakCount.textContent = Math.min(completedFree, 99);
+  document.querySelector(".stat-side-label").textContent = `${Math.round(completedFree / totalFreeLessons * 100)}%`;
+  premiumStatusNote.textContent = "";
+}
+
+function showDialog(content) {
+  lastDialogTrigger = document.activeElement;
+  dialogContent.innerHTML = content;
+  modalBackdrop.hidden = false;
+  document.querySelector("#dialog-close").focus();
+  document.body.style.overflow = "hidden";
+}
+
+function closeDialog() {
+  modalBackdrop.hidden = true;
+  document.body.style.overflow = "";
+  dialogContent.innerHTML = "";
+  if (lastDialogTrigger && typeof lastDialogTrigger.focus === "function") lastDialogTrigger.focus();
+}
+
+function showAccountDialog() {
+  showDialog(`
+    <span class="dialog-kicker">AKUN KODEKITA</span>
+    <h2 id="dialog-title">Login tidak tersedia di versi satu file</h2>
+    <p class="dialog-intro">Progres dan kode latihan tetap tersimpan di browser ini. Login lintas perangkat memerlukan backend.</p>`);
+}
+
+async function openCourse(courseId) {
+  const course = courses.find(item => item.id === courseId);
+  if (!course) return;
+  if (course.locked && !hasPremiumAccess()) {
+    showPremiumDialog();
+    return;
+  }
+
+
+  const lessonsMarkup = course.lessons.map((lesson, index) => {
+    const done = completedLessons.includes(`${course.id}-${index}`);
+    return `
+      <div class="lesson-item${done ? " is-done" : ""}">
+        <span class="lesson-number">${done ? "✓" : String(index + 1).padStart(2, "0")}</span>
+        <span class="lesson-main"><span class="lesson-title">${escapeHTML(lesson.title)}</span><span class="lesson-description">${escapeHTML(lesson.description)}</span></span>
+        <span class="lesson-duration">${lesson.minutes} mnt</span>
+        <button class="lesson-open" type="button" data-lesson="${course.id}-${index}">${done ? "Ulangi" : "Pelajari"}</button>
+      </div>`;
+  }).join("");
+
+  showDialog(`
+    <span class="dialog-kicker">${course.level} · ${course.lessons.length} MATERI</span>
+    <h2 id="dialog-title">${escapeHTML(course.title)}</h2>
+    <p class="dialog-intro">${escapeHTML(course.description)} Pilih materi untuk mempelajari konsep dan contoh kode. Kuis tersedia di halaman Kuis.</p>
+    <div class="lesson-list">${lessonsMarkup}</div>`);
+
+  modalBackdrop.dataset.activeCourse = courseId;
+}
+
+function createPracticePage(courseId, example) {
+  const practiceExample = example;
+  if (courseId === "html") {
+    if (practiceExample.trimStart().toLowerCase().startsWith("<!doctype")) return practiceExample;
+    return `<!doctype html>\n<html lang="id">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Latihan HTML</title></head>\n<body>\n${practiceExample}\n</body>\n</html>`;
+  }
+  if (courseId === "css") {
+    return `<!doctype html>\n<html lang="id">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Latihan CSS</title>\n<style>\n${practiceExample}\n</style></head>\n<body><main class="kartu"><h1>Latihan CSS</h1><p>Coba terapkan gaya pada halaman ini.</p></main></body>\n</html>`;
+  }
+
+  if (courseId === "dom") {
+    return `<!doctype html>\n<html lang="id">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Latihan DOM</title></head>\n<body>\n${practiceExample}\n</body>\n</html>`;
+  }
+  const markup = '<main><h1>Latihan JavaScript</h1><p id="pesan">Hasil console.log akan muncul di bawah.</p><button id="tombol" type="button">Coba interaksi</button><pre id="output" aria-live="polite"></pre></main>';
+  return `<!doctype html>\n<html lang="id">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Latihan JavaScript</title><style>body{font:16px system-ui,sans-serif;padding:24px;color:#293428}button{padding:8px 12px;cursor:pointer}#output{white-space:pre-wrap}</style></head>\n<body>\n${markup}\n<script>\nconst output = document.querySelector("#output");\nconst originalLog = console.log.bind(console);\nif (output) {\n  console.log = (...values) => {\n    output.textContent += values.map(value => value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)).join(" ") + "\\n";\n    originalLog(...values);\n  };\n  window.addEventListener("error", event => { output.textContent += "Error: " + event.message + "\\n"; });\n  window.addEventListener("unhandledrejection", event => { output.textContent += "Error: " + String(event.reason) + "\\n"; });\n}\n<\/script>\n<script>\n${practiceExample}\n<\/script>\n</body>\n</html>`;
+}
+
+function openLesson(courseId, lessonIndex) {
+  const course = courses.find(item => item.id === courseId);
+  const lesson = course?.lessons[lessonIndex];
+  const material = lessonMaterials[courseId]?.[lessonIndex];
+  if (!course || !lesson || !material) {
+    console.error(`Materi pelajaran tidak tersedia: ${courseId}-${lessonIndex}`);
+    return;
+  }
+
+  const isComplete = completedLessons.includes(`${courseId}-${lessonIndex}`);
+  showDialog(`
+    <span class="dialog-kicker">${escapeHTML(course.title)} · MATERI ${String(lessonIndex + 1).padStart(2, "0")}</span>
+    <h2 id="dialog-title">${escapeHTML(lesson.title)}</h2>
+    <p class="dialog-intro">${escapeHTML(material.explanation)}</p>
+    <div class="lesson-example-heading"><span>CONTOH KODE</span><span>${courseId.toUpperCase()}</span></div>
+    <pre class="lesson-code"><code>${escapeHTML(material.example)}</code></pre>
+    <div class="lesson-challenge"><strong>✦ Tantangan kecil</strong><span>${escapeHTML(material.challenge)}</span></div>
+    <div class="lesson-view-actions">
+      <button class="button button-subtle" id="back-to-course" type="button">← Kembali ke materi</button>
+      <button class="button button-subtle lesson-try" id="try-lesson" type="button">Coba di editor ↗</button>
+      <button class="button button-primary" id="complete-lesson" type="button">${isComplete ? "Selesai ✓" : "Tandai selesai ✓"}</button>
+    </div>`);
+  modalBackdrop.dataset.activeCourse = courseId;
+  modalBackdrop.dataset.activeLesson = String(lessonIndex);
+}
+
+function markLessonComplete(lessonId) {
+  if (!completedLessons.includes(lessonId)) {
+    completedLessons.push(lessonId);
+    saveCompletedLessons();
+  }
+  renderCourses();
+  const [courseId] = lessonId.split("-");
+  openCourse(courseId);
+}
+
+function showPremiumDialog() {
+  showDialog(`
+    <span class="dialog-kicker">KELAS KHUSUS PRO</span>
+    <h2 id="dialog-title">Fitur Pro memerlukan backend</h2>
+    <p class="dialog-intro">Login, materi Pro, dan pembayaran dinonaktifkan pada versi satu file. Materi belajar dasar, kuis, dan arena praktik tetap bisa digunakan.</p>`);
+}
+
+function getEditorValue() {
+  return codeMirrorEditor ? codeMirrorEditor.getValue() : editor.value;
+}
+
+function setEditorValue(value) {
+  editor.value = value;
+  if (codeMirrorEditor) codeMirrorEditor.setValue(value);
+}
+
+function syncLineNumbers() {
+  const lineCount = getEditorValue().split("\n").length;
+  document.querySelector("#editor-line-count").textContent = `${lineCount} baris`;
+}
+
+function saveEditorCode() {
+  try {
+    const value = getEditorValue();
+    editorFiles[selectedLanguage] = value;
+    localStorage.setItem(STORAGE_KEYS.files, JSON.stringify(editorFiles));
+    localStorage.setItem(STORAGE_KEYS.code, value);
+    localStorage.setItem(STORAGE_KEYS.language, selectedLanguage);
+    editorStatusMessage.textContent = "Tersimpan otomatis";
+  } catch (error) {
+    console.error("Tidak dapat menyimpan kode di browser:", error);
+    editorStatusMessage.textContent = "Penyimpanan browser penuh atau tidak tersedia";
+  }
+}
+
+const codeMirrorModes = {
+  html: "htmlmixed", css: "css", javascript: "javascript", typescript: "javascript",
+  json: {name:"javascript", json:true}, python:"python", java:"text/x-java", c:"text/x-csrc",
+  cpp:"text/x-c++src", csharp:"text/x-csharp", php:"application/x-httpd-php", ruby:"text/x-ruby",
+  go:"text/x-go", rust:"text/x-rustsrc", kotlin:"text/x-kotlin", swift:"text/x-swift",
+  sql:"text/x-sql", shell:"text/x-sh", bash:"text/x-sh", r:"text/x-rsrc", lua:"text/x-lua",
+  perl:"text/x-perl", yaml:"yaml", xml:"xml", markdown:"markdown", text:"text/plain"
+};
+
+const modeScriptNames = {
+  python:"python", java:"clike", c:"clike", cpp:"clike", csharp:"clike", php:"php", ruby:"ruby",
+  go:"go", rust:"rust", kotlin:"kotlin", swift:"swift", sql:"sql", shell:"shell", bash:"shell",
+  r:"r", lua:"lua", perl:"perl", yaml:"yaml", markdown:"markdown", xml:"xml", clojure:"clojure",
+  haskell:"haskell", scala:"clike", dart:"dart", typescript:"javascript", json:"javascript"
+};
+const loadedModes = new Set(["xml","javascript","css","htmlmixed"]);
+function ensureCodeMirrorMode(language) {
+  const mode = codeMirrorModes[language];
+  if (!codeMirrorEditor || !mode) return;
+  const modeName = typeof mode === "string" ? mode : mode.name;
+  const scriptName = modeScriptNames[language] || modeName;
+  if (loadedModes.has(scriptName)) { codeMirrorEditor.setOption("mode", mode); return; }
+  if (!scriptName || scriptName === "text/plain") { codeMirrorEditor.setOption("mode", "text/plain"); return; }
+  if (document.querySelector(`script[data-cm-mode="${scriptName}"]`)) return;
+  const script = document.createElement("script");
+  script.src = `https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/${scriptName}/${scriptName}.min.js`;
+  script.dataset.cmMode = scriptName;
+  script.onload = () => { loadedModes.add(scriptName); if (selectedLanguage === language) codeMirrorEditor.setOption("mode", mode); };
+  script.onerror = () => { codeMirrorEditor.setOption("mode", "text/plain"); };
+  document.head.append(script);
+}
+
+function updateEditorLanguageDetails() {
+  const info = languageCatalog[selectedLanguage] || {name:selectedLanguage, extension:"txt"};
+  editorFileName.textContent = `main.${info.extension}`;
+  if (editorLanguageLabel) editorLanguageLabel.textContent = info.name;
+  editor.setAttribute("aria-label", `Editor kode ${info.name}`);
+  document.querySelector("#download-code").title = `Unduh file ${info.extension}`;
+  ensureCodeMirrorMode(selectedLanguage);
+  previewTipText.textContent = ["html","css","javascript"].includes(selectedLanguage)
+    ? "Kode dijalankan di pratinjau browser."
+    : "Kode dijalankan melalui OnlineCompiler; perlu Widget Key gratis dan koneksi internet.";
+}
+
+function switchEditorLanguage(languageId) {
+  if (!languageCatalog[languageId]) return;
+  saveEditorCode();
+  selectedLanguage = languageId;
+  const info = languageCatalog[languageId];
+  setEditorValue(editorFiles[languageId] || info.starter || `// Mulai menulis kode ${info.name} di sini`);
+  updateEditorLanguageDetails();
+  syncLineNumbers();
+  saveEditorCode();
+}
+
+const onlineCompilerLanguages = {
+  python: {compiler:"python-3.14", name:"Python"},
+  c: {compiler:"gcc-15", name:"C"},
+  cpp: {compiler:"g++-15", name:"C++"},
+  java: {compiler:"openjdk-25", name:"Java"},
+  csharp: {compiler:"dotnet-csharp-9", name:"C#"},
+  fsharp: {compiler:"dotnet-fsharp-9", name:"F#"},
+  php: {compiler:"php-8.5", name:"PHP"},
+  ruby: {compiler:"ruby-4.0", name:"Ruby"},
+  haskell: {compiler:"haskell-9.12", name:"Haskell"},
+  go: {compiler:"go-1.26", name:"Go"},
+  rust: {compiler:"rust-1.93", name:"Rust"},
+  typescript: {compiler:"typescript-deno", name:"TypeScript"}
+};
+
+function loadRuntimeLanguages() {
+  const supported = ["html", "css", "javascript", ...Object.keys(onlineCompilerLanguages)];
+  languageSelect.innerHTML = "";
+  const groups = {"Web (browser)": ["html", "css", "javascript"], "Bahasa dengan compiler online": Object.keys(onlineCompilerLanguages)};
+  Object.entries(groups).forEach(([label, ids]) => {
+    const group = document.createElement("optgroup"); group.label = label;
+    ids.forEach(id => {
+      const item = languageCatalog[id];
+      if (!item || !supported.includes(id)) return;
+      const option = document.createElement("option"); option.value=id; option.textContent=item.name; group.append(option);
+    });
+    languageSelect.append(group);
+  });
+  if (!supported.includes(selectedLanguage)) { selectedLanguage = "html"; setEditorValue(languageCatalog.html.starter); updateEditorLanguageDetails(); }
+  languageSelect.value = selectedLanguage;
+  editorStatusMessage.textContent = "Siap · 15 pilihan bahasa";
+}
+
+function getRuntimeWidgetKey() {
+  try { return localStorage.getItem("kodekita-onlinecompiler-widget-key-v1") || ""; }
+  catch { return ""; }
+}
+
+function configureRuntimeKey() {
+  const current = getRuntimeWidgetKey();
+  const key = window.prompt(
+    "Tempel Widget Key OnlineCompiler (bukan REST API key). Buat gratis melalui dashboard OnlineCompiler > Widgets. Kunci widget memang dirancang untuk ditanam di website.\n\nWidget Key:",
+    current
+  );
+  if (key === null) return;
+  const cleaned = key.trim();
+  if (!cleaned) {
+    localStorage.removeItem("kodekita-onlinecompiler-widget-key-v1");
+    editorStatusMessage.textContent = "Kunci runtime dihapus";
+    return;
+  }
+  localStorage.setItem("kodekita-onlinecompiler-widget-key-v1", cleaned);
+  editorStatusMessage.textContent = "Kunci runtime tersimpan di perangkat ini";
+}
+
+function renderExecutionResult(result, languageName) {
+  const output = [result.output, result.error].filter(Boolean).join("\\n") || (result.status === "success" ? "Program selesai tanpa output." : "Tidak ada output.");
+  const safe = output.replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const status = result.status === "success" && Number(result.exit_code) === 0 ? "Berhasil" : "Selesai dengan error";
+  const exitCode = result.exit_code == null ? "-" : result.exit_code;
+  previewFrame.srcdoc = `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:18px;background:#111;color:#e7eee7;font:13px/1.6 ui-monospace,monospace}h3{font:600 13px system-ui;color:#a8d36c}pre{white-space:pre-wrap;overflow-wrap:anywhere}small{color:#aab4aa;font:11px system-ui}</style></head><body><h3>OUTPUT · ${languageName}</h3><pre>${safe}</pre><small>Status: ${status} · Exit code: ${exitCode}${result.time ? ` · Waktu: ${result.time}s` : ""}</small></body></html>`;
+  editorStatusMessage.textContent = status === "Berhasil" ? "Program berhasil dijalankan" : "Program selesai dengan error";
+}
+
+async function executeWithOnlineCompiler(source, lang) {
+  const key = getRuntimeWidgetKey();
+  if (!key) throw new Error("Kunci runtime belum dipasang. Tekan tombol ⚙ Koneksi, lalu masukkan Widget Key gratis dari dashboard OnlineCompiler > Widgets.");
+  if (!window.io) throw new Error("Library koneksi runtime gagal dimuat. Periksa internet lalu muat ulang halaman.");
+  const config = onlineCompilerLanguages[lang];
+  if (!config) throw new Error("Bahasa ini belum didukung oleh layanan runtime gratis yang terhubung.");
+  return await new Promise((resolve, reject) => {
+    let settled = false;
+    const socket = window.io("https://api.onlinecompiler.io", {
+      transports: ["websocket", "polling"],
+      auth: { token: key },
+      reconnection: false,
+      timeout: 15000
+    });
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      socket.disconnect();
+      fn(value);
+    };
+    const timer = setTimeout(() => finish(reject, new Error("Waktu koneksi habis. Periksa Widget Key dan koneksi internet.")), 35000);
+    socket.on("connect", () => {
+      socket.emit("runcode", {
+        api_key: key,
+        compiler: config.compiler,
+        code: source,
+        input: ""
+      });
+    });
+    socket.on("codeoutput", result => finish(resolve, result));
+    socket.on("connect_error", error => finish(reject, new Error(`Koneksi runtime ditolak: ${error.message || "periksa Widget Key"}`)));
+    socket.on("error", error => finish(reject, new Error(error?.message || "Runtime mengembalikan kesalahan koneksi.")));
+  });
+}
+
+function scriptLiteral(value) {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
+function makeJavaScriptPreview(source) {
+  const code = scriptLiteral(source);
+  return `<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>body{font:14px system-ui,sans-serif;padding:20px;color:#293428}button{padding:8px 12px;cursor:pointer}pre{white-space:pre-wrap;background:#f3f5ef;padding:10px;border-radius:6px}</style><body><h2>Hasil JavaScript</h2><button id="run-example" type="button">Klik untuk mencoba</button><pre id="output" aria-live="polite"></pre><script>const source=${code};const out=document.querySelector("#output");const originalLog=console.log.bind(console);console.log=(...values)=>{const text=values.map(value=>{if(typeof value==="string")return value;try{return JSON.stringify(value)}catch{return String(value)}}).join(" ");out.textContent+=text+"\\n";originalLog(...values)};window.addEventListener("error",event=>{out.textContent+="Error: "+event.message+"\\n"});window.addEventListener("unhandledrejection",event=>{out.textContent+="Error: "+String(event.reason)+"\\n"});try{(0,eval)(source)}catch(error){out.textContent+="Error: "+error.message}<\/script></body></html>`;
+}
+
+function makeCssPreview(source) {
+  const css = scriptLiteral(source);
+  return `<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><body><main class="kartu"><h1>Latihan CSS</h1><p>Ubah gaya lewat editor, lalu jalankan ulang.</p><button type="button">Contoh tombol</button></main><script>const style=document.createElement("style");style.textContent=${css};document.head.append(style)<\/script></body></html>`;
+}
+
+function fitPhonePreview() {
+  // Preview memakai viewport responsif asli; tidak diperkecil paksa.
+  previewFrame.style.transform = "none";
+  previewFrame.style.marginBottom = "0";
+}
+
+function togglePreviewFullscreen() {
+  const pane = previewFrame.closest(".preview-pane");
+  if (!pane) return;
+  const active = pane.classList.toggle("is-fullscreen");
+  document.body.style.overflow = active ? "hidden" : "";
+  const button = document.querySelector("#preview-fullscreen");
+  if (button) button.textContent = active ? "✕ Tutup layar penuh" : "⛶ Layar penuh";
+  fitPhonePreview();
+}
+
+async function runCode() {
+  const source = getEditorValue();
+  const lang = selectedLanguage;
+  const localWeb = ["html", "css", "javascript"].includes(lang);
+  const runButton = document.querySelector("#run-code");
+  runButton.disabled = true;
+  runButton.textContent = "Menjalankan…";
+  try {
+    if (lang === "html") previewFrame.srcdoc = source;
+    else if (lang === "css") previewFrame.srcdoc = makeCssPreview(source);
+    else if (lang === "javascript") previewFrame.srcdoc = makeJavaScriptPreview(source);
+    else {
+      const meta = languageCatalog[lang];
+      previewFrame.srcdoc = `<html><body style="font:14px system-ui;padding:16px;color:#263126">Menjalankan ${meta?.name || lang}…</body></html>`;
+      const result = await executeWithOnlineCompiler(source, lang);
+      renderExecutionResult(result, meta?.name || lang);
+    }
+    if (localWeb) editorStatusMessage.textContent = "Preview berhasil diperbarui";
+    fitPhonePreview();
+  } catch (error) {
+    const msg = String(error.message || error);
+    const safe = msg.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    previewFrame.srcdoc = `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:18px;background:#111;color:#f2a6a0;font:14px/1.6 system-ui"><b>Belum bisa menjalankan kode</b><pre style="white-space:pre-wrap;overflow-wrap:anywhere">${safe}</pre><p style="color:#c9c9c9">Bahasa selain HTML/CSS/JavaScript membutuhkan Widget Key OnlineCompiler dan koneksi internet.</p></body></html>`;
+    editorStatusMessage.textContent = "Runtime belum terhubung atau terjadi kesalahan";
+  } finally {
+    runButton.disabled = false;
+    runButton.innerHTML = "<span>▶</span> Jalankan";
+  }
+}
+
+function downloadCode() {
+  const info = languageCatalog[selectedLanguage] || {extension:"txt"};
+  const blob = new Blob([getEditorValue()], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `main.${info.extension}`;
+  document.body.append(link); link.click(); link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function initializeEditor() {
+  let savedCode = null;
+  try {
+    const storedFiles = JSON.parse(localStorage.getItem(STORAGE_KEYS.files) || "{}");
+    if (storedFiles && typeof storedFiles === "object" && typeof storedFiles.html === "string") savedCode = storedFiles.html;
+    savedCode = savedCode || localStorage.getItem(STORAGE_KEYS.code);
+  } catch (error) {
+    console.error("Tidak dapat membaca proyek tersimpan:", error);
+  }
+  try { editorFiles = JSON.parse(localStorage.getItem(STORAGE_KEYS.files) || "{}"); } catch { editorFiles = {}; }
+  selectedLanguage = localStorage.getItem(STORAGE_KEYS.language) || "html";
+  if (!languageCatalog[selectedLanguage]) selectedLanguage = "html";
+  const initialCode = editorFiles[selectedLanguage] || savedCode || starterCode;
+  editor.value = initialCode;
+  if (window.CodeMirror) {
+    codeMirrorEditor = CodeMirror.fromTextArea(editor, {
+      mode: "htmlmixed", theme: "material-darker", lineNumbers: true,
+      matchBrackets: true, autoCloseTags: true, indentUnit: 2, tabSize: 2,
+      indentWithTabs: false, lineWrapping: false, autofocus: false,
+      extraKeys: { "Ctrl-S": cm => { saveEditorCode(); }, "Cmd-S": cm => { saveEditorCode(); },
+        "Tab": cm => cm.replaceSelection("  ", "end") }
+    });
+    codeMirrorEditor.on("change", () => {
+      editor.value = codeMirrorEditor.getValue();
+      syncLineNumbers();
+      saveEditorCode();
+    });
+    setTimeout(() => codeMirrorEditor.refresh(), 80);
+  }
+  updateEditorLanguageDetails();
+  loadRuntimeLanguages();
+  syncLineNumbers();
+  runCode();
+}
+
+curriculumGrid.addEventListener("click", event => {
+  const button = event.target.closest("[data-course]");
+  if (button) openCourse(button.dataset.course);
+});
+
+courseNav.addEventListener("click", event => {
+  const link = event.target.closest("[data-premium]");
+  if (link) {
+    event.preventDefault();
+    showPremiumDialog();
+  }
+});
+
+quizGrid.addEventListener("click", event => {
+  const card = event.target.closest("[data-quiz-card]");
+  const answerButton = event.target.closest("[data-page-answer]");
+  if (card && answerButton && card.dataset.checked !== "true") {
+    card.dataset.selectedAnswer = answerButton.dataset.pageAnswer;
+    card.querySelectorAll("[data-page-answer]").forEach(option => option.classList.remove("selected"));
+    answerButton.classList.add("selected");
+    card.querySelector("[data-check-page-quiz]").disabled = false;
+    return;
+  }
+
+  const checkButton = event.target.closest("[data-check-page-quiz]");
+  if (!card || !checkButton) {
+    const courseButton = event.target.closest("[data-course]");
+    if (courseButton) openCourse(courseButton.dataset.course);
+    return;
+  }
+
+  if (card.dataset.checked === "true") {
+    delete card.dataset.checked;
+    delete card.dataset.selectedAnswer;
+    card.querySelectorAll("[data-page-answer]").forEach(option => {
+      option.disabled = false;
+      option.classList.remove("selected", "correct", "incorrect");
+    });
+    card.querySelector("[data-quiz-feedback]").textContent = "";
+    card.querySelector("[data-quiz-status]").textContent = "";
+    checkButton.textContent = "Periksa jawaban";
+    checkButton.disabled = true;
+    return;
+  }
+
+  if (card.dataset.selectedAnswer === undefined) return;
+  const course = courses.find(item => item.id === card.dataset.courseId);
+  if (!course?.quiz) return;
+
+  const selectedAnswer = Number(card.dataset.selectedAnswer);
+  const isCorrect = selectedAnswer === course.quiz.answer;
+  card.dataset.checked = "true";
+  card.querySelectorAll("[data-page-answer]").forEach((option, index) => {
+    option.disabled = true;
+    if (index === course.quiz.answer) option.classList.add("correct");
+    else if (index === selectedAnswer) option.classList.add("incorrect");
+  });
+  card.querySelector("[data-quiz-feedback]").textContent = isCorrect
+    ? course.quiz.explanation
+    : `Belum tepat. ${course.quiz.explanation}`;
+  card.querySelector("[data-quiz-feedback]").style.color = isCorrect ? "#64843c" : "#a45e50";
+  card.querySelector("[data-quiz-status]").textContent = isCorrect ? "Jawaban benar!" : "Coba pelajari materinya lagi.";
+  checkButton.textContent = "Coba lagi";
+  checkButton.disabled = false;
+});
+
+dialogContent.addEventListener("click", event => {
+  const lessonButton = event.target.closest("[data-lesson]");
+  if (lessonButton) {
+    const [courseId, lessonIndex] = lessonButton.dataset.lesson.split("-");
+    openLesson(courseId, Number(lessonIndex));
+    return;
+  }
+
+  if (event.target.closest("#back-to-course")) {
+    openCourse(modalBackdrop.dataset.activeCourse);
+    return;
+  }
+
+  if (event.target.closest("#complete-lesson")) {
+    markLessonComplete(`${modalBackdrop.dataset.activeCourse}-${modalBackdrop.dataset.activeLesson}`);
+    return;
+  }
+
+  if (event.target.closest("#try-lesson")) {
+    const courseId = modalBackdrop.dataset.activeCourse;
+    const lessonIndex = Number(modalBackdrop.dataset.activeLesson);
+    const example = lessonMaterials[courseId]?.[lessonIndex]?.example;
+    if (example) {
+      switchEditorLanguage("html");
+      setEditorValue(createPracticePage(courseId, example));
+      saveEditorCode();
+      syncLineNumbers();
+      runCode();
+      closeDialog();
+      document.querySelector("#editor").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    return;
+  }
+
+});
+
+document.querySelector("#dialog-close").addEventListener("click", closeDialog);
+modalBackdrop.addEventListener("click", event => {
+  if (event.target === modalBackdrop) closeDialog();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !modalBackdrop.hidden) closeDialog();
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); runCode(); }
+});
+
+document.querySelector("#premium-cta").addEventListener("click", showPremiumDialog);
+document.querySelector("#account-button").addEventListener("click", showAccountDialog);
+document.querySelector("#run-code").addEventListener("click", runCode);
+document.querySelector("#runtime-settings").addEventListener("click", configureRuntimeKey);
+languageSelect.addEventListener("change", event => switchEditorLanguage(event.target.value));
+document.querySelector("#preview-fullscreen").addEventListener("click", togglePreviewFullscreen);
+document.addEventListener("keydown", event => { if (event.key === "Escape") { const pane = previewFrame.closest(".preview-pane"); if (pane && pane.classList.contains("is-fullscreen")) togglePreviewFullscreen(); } });
+window.addEventListener("resize", fitPhonePreview);
+document.querySelector("#download-code").addEventListener("click", downloadCode);
+
+document.querySelector("#reset-code").addEventListener("click", () => {
+  setEditorValue(languageCatalog[selectedLanguage]?.starter || starterCode);
+  saveEditorCode();
+  syncLineNumbers();
+  runCode();
+});
+editor.addEventListener("input", () => { syncLineNumbers(); saveEditorCode(); });
+
+document.querySelector("#menu-toggle").addEventListener("click", () => {
+  document.querySelector("#sidebar").classList.toggle("is-open");
+});
+document.querySelectorAll(".main-nav .nav-link").forEach(link => {
+  link.addEventListener("click", () => {
+    document.querySelector("#sidebar").classList.remove("is-open");
+  });
+});
+window.addEventListener("hashchange", updatePage);
+document.addEventListener("click", event => {
+  const sidebar = document.querySelector("#sidebar");
+  if (sidebar.classList.contains("is-open") && !sidebar.contains(event.target) && !event.target.closest("#menu-toggle")) {
+    sidebar.classList.remove("is-open");
+  }
+});
+
+renderCourses();
+initializeEditor();
+updatePage();
+
+  </script>
+
+<script id="lp-settings-script">
+(()=>{
+ 'use strict';
+ const themeButton=document.getElementById('theme-toggle');
+ const languageSelect=document.getElementById('lp-language-select');
+ const themeLabel=document.getElementById('theme-label');
+ const themeIcon=document.getElementById('theme-icon');
+ if(!themeButton||!languageSelect||!themeLabel||!themeIcon)return;
+ const targets={id:'id',en:'en','en-SG':'en',zh:'zh-CN',ja:'ja',ru:'ru',ms:'ms',ko:'ko',es:'es',fr:'fr'};
+ const themeNames={id:['Gelap','Terang'],en:['Dark','Light'],'en-SG':['Dark','Light'],zh:['深色','浅色'],ja:['ダーク','ライト'],ru:['Тёмная','Светлая'],ms:['Gelap','Cerah'],ko:['다크','라이트'],es:['Oscuro','Claro'],fr:['Sombre','Clair']};
+ const cache=new Map(), originals=new WeakMap(), attrOriginals=new WeakMap(), nodeEpoch=new WeakMap();
+ const skipTags=new Set(['SCRIPT','STYLE','TEXTAREA','INPUT','SELECT','OPTION','CODE','PRE','SVG','NOSCRIPT','IFRAME']);
+ const skipSelector='.CodeMirror, .CodeMirror *, #code-editor, #preview-frame, .editor-card .project-tab, .file-tab, .html-label, .line-no, .code-lines, [data-no-translate], [contenteditable="true"]';
+ let current='id', epoch=0, observer=null, queue=[], active=0, pumping=false;
+ const MAX_ACTIVE=3;
+ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ function eligibleText(node){const el=node.parentElement;return !!(el&&!skipTags.has(el.tagName)&&!el.closest(skipSelector)&&node.nodeValue.trim()&&!/^([\d\W_]+)$/.test(node.nodeValue.trim()));}
+ function eligibleAttr(el,name){return !skipTags.has(el.tagName)&&!el.closest(skipSelector)&&['placeholder','title','aria-label','alt'].includes(name);}
+ function remember(node){if(!originals.has(node))originals.set(node,node.nodeValue);return originals.get(node);}
+ async function requestTranslation(source,lang){
+   const key=lang+'\u0000'+source;if(cache.has(key))return cache.get(key);
+   let result=source;
+   try{
+     const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl='+encodeURIComponent(targets[lang])+'&dt=t&q='+encodeURIComponent(source);
+     const response=await fetch(url,{method:'GET'});
+     if(!response.ok)throw new Error('HTTP '+response.status);
+     const data=await response.json();
+     const translated=(data[0]||[]).map(part=>part[0]||'').join('');
+     if(translated.trim())result=translated;
+   }catch(error){console.warn('Terjemahan tidak tersedia untuk sementara:',error);}
+   cache.set(key,result);return result;
+ }
+ function enqueue(task){queue.push(task);pump();}
+ async function pump(){
+   if(pumping)return;pumping=true;
+   while(queue.length||active){
+     while(active<MAX_ACTIVE&&queue.length){const task=queue.shift();active++;Promise.resolve().then(task).catch(()=>{}).finally(()=>{active--;pump();});}
+     if(active>=MAX_ACTIVE)await wait(25);else if(!queue.length)break;
+   }
+   pumping=false;
+ }
+ function translateText(node,run=epoch){
+   if(!eligibleText(node))return;
+   const source=remember(node);if(!source||!source.trim())return;
+   if(current==='id'){if(node.nodeValue!==source)node.nodeValue=source;return;}
+   if(nodeEpoch.get(node)===run)return;nodeEpoch.set(node,run);
+   const lead=source.match(/^\s*/)?.[0]||'',trail=source.match(/\s*$/)?.[0]||'';
+   const core=source.slice(lead.length,source.length-trail.length);
+   enqueue(async()=>{
+     const translated=await requestTranslation(core,current);
+     if(node.isConnected&&run===epoch&&current!=='id'){
+       const value=lead+translated+trail;if(node.nodeValue!==value)node.nodeValue=value;
+     }
+   });
+ }
+ function translateAttr(el,name,run=epoch){
+   if(!eligibleAttr(el,name))return;
+   let saved=attrOriginals.get(el);if(!saved){saved={};attrOriginals.set(el,saved);}
+   if(!(name in saved))saved[name]=el.getAttribute(name)||'';
+   const source=saved[name];if(!source)return;
+   if(current==='id'){if(el.getAttribute(name)!==source)el.setAttribute(name,source);return;}
+   enqueue(async()=>{const translated=await requestTranslation(source,current);if(el.isConnected&&run===epoch&&current!=='id'&&el.getAttribute(name)!==translated)el.setAttribute(name,translated);});
+ }
+ function scan(root=document.body,run=epoch){
+   if(root.nodeType===Node.TEXT_NODE){translateText(root,run);return;}
+   if(root.nodeType!==Node.ELEMENT_NODE&&root!==document.body)return;
+   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
+   while((node=walker.nextNode()))translateText(node,run);
+   const elements=[];if(root.nodeType===Node.ELEMENT_NODE)elements.push(root);
+   if(root.querySelectorAll)elements.push(...root.querySelectorAll('*'));
+   for(const el of elements)for(const attr of ['placeholder','title','aria-label','alt'])if(el.hasAttribute(attr))translateAttr(el,attr,run);
+ }
+ function restoreOriginals(){
+   const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
+   while((node=walker.nextNode()))if(originals.has(node)){const value=originals.get(node);if(node.nodeValue!==value)node.nodeValue=value;}
+   document.querySelectorAll('*').forEach(el=>{const saved=attrOriginals.get(el);if(saved)for(const [name,value] of Object.entries(saved))if(el.getAttribute(name)!==value)el.setAttribute(name,value);});
+ }
+ function updateThemeLabel(){const dark=document.body.classList.contains('dark-mode');const pair=themeNames[current]||themeNames.en;themeLabel.textContent=pair[dark?1:0];themeIcon.textContent=dark?'☀':'☾';themeButton.setAttribute('aria-label',pair[dark?1:0]);}
+ function setTheme(mode){const dark=mode==='dark';document.body.classList.toggle('dark-mode',dark);try{localStorage.setItem('lp-theme',dark?'dark':'light');}catch(error){}updateThemeLabel();}
+ function applyLanguage(code){
+   current=targets[code]?code:'id';epoch++;queue=[];restoreOriginals();
+   languageSelect.value=current;document.documentElement.lang=targets[current];
+   if(observer)observer.disconnect();
+   scan(document.body,epoch);
+   if(observer)observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+   try{localStorage.setItem('lp-language',current);}catch(error){}
+   updateThemeLabel();
+ }
+ let savedLang='id',savedTheme='light';try{savedLang=localStorage.getItem('lp-language')||'id';savedTheme=localStorage.getItem('lp-theme')||'light';}catch(error){}
+ if(!targets[savedLang])savedLang='id';
+ observer=new MutationObserver(records=>{
+   const run=epoch;
+   for(const record of records){
+     if(record.type==='characterData')translateText(record.target,run);
+     for(const node of record.addedNodes||[])scan(node,run);
+   }
+ });
+ setTheme(savedTheme);
+ applyLanguage(savedLang);
+ observer.observe(document.body,{subtree:true,childList:true,characterData:true});
+ themeButton.addEventListener('click',()=>setTheme(document.body.classList.contains('dark-mode')?'light':'dark'));
+ languageSelect.addEventListener('change',()=>applyLanguage(languageSelect.value));
+})();
+</script>
+
+</body>
+</html>
